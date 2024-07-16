@@ -1,0 +1,12 @@
+sat
+(
+  (define-fun m_0_0 () (_ BitVec 16) #b0000000000001001)
+  (define-fun m_0_1 () (_ BitVec 16) #b0000000000000001)
+  (define-fun m_0_2 () (_ BitVec 16) #b0000000000000101)
+  (define-fun m_1_0 () (_ BitVec 16) #b0000000000000100)
+  (define-fun m_1_1 () (_ BitVec 16) #b0000000000001000)
+  (define-fun m_1_2 () (_ BitVec 16) #b0000000000000011)
+  (define-fun m_2_0 () (_ BitVec 16) #b0000000000000010)
+  (define-fun m_2_1 () (_ BitVec 16) #b0000000000000110)
+  (define-fun m_2_2 () (_ BitVec 16) #b0000000000000111)
+)
