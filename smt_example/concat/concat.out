@@ -1,0 +1,6 @@
+sat
+(
+  (define-fun X_error_3 () (_ BitVec 1) #b0)
+  (define-fun X_error_2 () (_ BitVec 1) #b0)
+  (define-fun X_error_1 () (_ BitVec 1) #b1)
+)
