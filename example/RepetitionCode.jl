@@ -22,14 +22,6 @@ function mwpm(n::Integer, s)
     (r, ϕ₁, ϕ₂ & ϕ₃)
 end
 
-@qprog repetition_m_zz (n, idx) begin
-    CNOT(idx, idx%n+1)
-    res = M(idx%n+1)
-    CNOT(idx, idx%n+1)
-    
-    res
-end
-
 function repetition_s(n, idx)
     s = zeros(Bool, 2*n)
 
@@ -57,18 +49,29 @@ function repetition_lz(n)
     s
 end
 
+@qprog repetition_m_zz (n, idx) begin
+    CNOT(idx, idx%n+1)
+    res = M(idx%n+1)
+    CNOT(idx, idx%n+1)
+    
+    res
+end
+
 @qprog repetition_decoder (n) begin
     s = [repetition_m_zz(n, j) for j in 1:n]
 
     r = mwpm(n, s)
 
+    # Recovery
     for j in 1:n
         sX(j, r[j])
     end
 
+    # Strange bug------#
     e = reduce(&, r[1:((n-1)÷2)])
 
     sX(1, e)
+    # ---------------- #
 end
 
 function check_repetition_decoder(n)
@@ -77,8 +80,12 @@ function check_repetition_decoder(n)
     @time begin
         num_qubits = n
 
-	    stabilizer = Matrix{Bool}(undef, num_qubits, 2*num_qubits)
-	    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
+	    # stabilizer = Matrix{Bool}(undef, num_qubits, 2*num_qubits)
+	    stabilizer = fill(false, num_qubits, 2*num_qubits)
+
+        # print("Init stabilizer: $(stabilizer)\n")
+	    
+        phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
 	    lx = _bv_const(ctx, "lx")
 	    lz = _bv_const(ctx, "lz")
 
@@ -89,6 +96,8 @@ function check_repetition_decoder(n)
 
 	    stabilizer[1,:] = repetition_lx(n)
 	    phases[1] = lx
+
+        print("Encoded Stabilizer: $(stabilizer)\n")
 
         σ = CState([(:n, n),
             (:repetition_decoder, repetition_decoder),
@@ -101,7 +110,11 @@ function check_repetition_decoder(n)
         ρ₀ = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ = copy(ρ₀)
 
+        println("ρ after stabilizer : $(ρ)")
+
         num_x_errors = (n-1)÷2
+        println("NUM X errors : $(num_x_errors)")
+
         x_errors = inject_errors(ρ, "X")
         ϕ_x = _sum(ctx, x_errors, num_qubits) <= bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
 
@@ -135,14 +148,9 @@ function check_repetition_decoder(n)
     res, t3-t0, t1-t0, t2-t1, t3-t2
 end
 
-check_repetition_decoder(20) # precompile time
+# check_repetition_decoder(20) # precompile time
 
-open("repetition_code.dat", "w") do io
-  println(io, "nq all init qse smt")
-  println("nq all init qse smt")
-  for j in 1:28
-    res, all, init, qse, smt = check_repetition_decoder(50*j)
-    println(io, "$(50*j) $(all) $(init) $(qse) $(smt)")
-    println("$(j)/28: $(50*j) $(all) $(init) $(qse) $(smt)")
-  end
-end
+nq = 3
+res, all, init, qse, smt = check_repetition_decoder(nq)
+println("nq all init qse smt")
+println("$(nq) $(all) $(init) $(qse) $(smt)")
