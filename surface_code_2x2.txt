@@ -1,0 +1,23 @@
+
+julia> include("example/SurfaceCode_2x2.jl")
+[ Info: Initailization Stage
+Stabilizer init: Bool[1 0 1 0; 1 1 0 0; 0 0 1 1; 0 1 0 1]ERROR: LoadError: DimensionMismatch: number of columns of each array must match (got (8, 4))
+Stacktrace:
+ [1] _typed_vcat(::Type{Bool}, A::Tuple{Matrix{Bool}, Matrix{Bool}})
+   @ Base ./abstractarray.jl:1702
+ [2] typed_vcat
+   @ ./abstractarray.jl:1716 [inlined]
+ [3] vcat
+   @ /usr/local/julia-1.10.4/share/julia/stdlib/v1.10/SparseArrays/src/sparsevector.jl:1239 [inlined]
+ [4] from_stabilizer(num_qubits::Int64, Stabilizer::Matrix{…}, phases1::Vector{…}, ctx::Z3.ContextAllocated)
+   @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:205
+ [5] check_toric_decoder(d::Int64)
+   @ Main /home/manvi-agrawal/QuantumSE.jl/example/SurfaceCode_2x2.jl:158
+ [6] top-level scope
+   @ /home/manvi-agrawal/QuantumSE.jl/example/SurfaceCode_2x2.jl:220
+ [7] include(fname::String)
+   @ Base.MainInclude ./client.jl:489
+ [8] top-level scope
+   @ REPL[14]:1
+in expression starting at /home/manvi-agrawal/QuantumSE.jl/example/SurfaceCode_2x2.jl:220
+Some type information was truncated. Use `show(err)` to see complete types.
