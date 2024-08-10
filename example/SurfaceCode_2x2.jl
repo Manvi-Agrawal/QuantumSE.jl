@@ -55,15 +55,18 @@ end
 @qprog toric_x_m (d, idx) begin
     b = _xadj(d, idx)
     
+    H(idx)
     CNOT(idx, b[1])
     CNOT(idx, b[2])
-
     H(idx)
+
     res = M(idx)
-    H(idx)
 
+    H(idx)
     CNOT(idx, b[2])
     CNOT(idx, b[1])
+    H(idx)
+
     
     res
 end
@@ -73,13 +76,13 @@ end
 @qprog toric_z_m (d, idx) begin
     b = _zadj(d, idx)
     
-    CNOT(idx, b[1])
-    CNOT(idx, b[2])
+    CNOT(b[1], idx)
+    CNOT(b[2], idx)
 
     res = M(idx)
 
-    CNOT(idx, b[2])
-    CNOT(idx, b[1])
+    CNOT(b[2], idx)
+    CNOT(b[1], idx)
 
     res
 end
@@ -87,10 +90,11 @@ end
 
 @qprog toric_decoder (d) begin
 
-    aq = [2, 3]
+    aq_x = [2]
+    s_x = [toric_x_m(d, j) for j in aq_x]
 
-    s_x = [toric_x_m(d, j) for j in aq]
-    s_z = [toric_z_m(d, j) for j in aq]
+    aq_z = [3]
+    s_z = [toric_z_m(d, j) for j in aq_z]
     
     r_x = mwpm(d, s_x, "X")
     r_z = mwpm(d, s_z, "Z")
@@ -149,10 +153,27 @@ function check_toric_decoder(d::Integer)
 
         # [
         # X1 X2 Z1 Z2
-        # 1  0  1  0;
-        # 1  1  0  0;
-        # 0  0  1  1;
-        # 0  1  0  1;
+        # 1  0  1  0; D1
+        # 1  1  0  0; A1
+        # 0  0  1  1; A2
+        # 0  1  0  1; D2
+        # ]
+
+         # [
+        # X1 X2 X3 X4     Z1 Z2 Z3 Z4
+        # 1  1  1  1      0  0  0  0  
+        # 0  0  0  0      1  1  1  1  
+        # 1  0  1  0      0  0  0  0  
+        # 0  0  0  0      0  1  0  1  
+        # ]
+
+        
+        # [
+        # X1 X2 X3 X4  Z1 Z2 Z3 Z4
+        # 1  0  0 0     1  0 0 0   D1
+        # 1  1  0 0     0  0 0 0   A1
+        # 0  0  0 0     1  1 0 0   A2
+        # 0  1  0 0     0  1 0 0   D2
         # ]
 
         ρ01 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
