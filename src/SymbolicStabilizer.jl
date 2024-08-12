@@ -556,11 +556,16 @@ function check_state_equivalence(q1::SymStabilizerState, q2::SymStabilizerState,
 
     Z3.reset(slv)
 
-    conjecture = reduce(&, [simplify(q1.phases[j] ⊻ q2.phases[j]) == _bv_val(q1.ctx, 0) for j in ranges])
+    println("Slv after pre-cond reset: $(slv)")
 
+    conjecture = reduce(&, [simplify(q1.phases[j] ⊻ q2.phases[j]) == _bv_val(q1.ctx, 0) for j in ranges])
+    
+    println("Conjecture by reduce: $(conjecture)")
     conjecture = assumptions[1] & assumptions[3] & not(conjecture)
 
+    println("A1: $(assumptions[1])")
     add(slv, conjecture)
+    println("A3: $(assumptions[3])")
 
     if use_z3
         res = check(slv)
