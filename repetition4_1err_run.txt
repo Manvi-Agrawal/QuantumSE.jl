@@ -1,0 +1,35 @@
+include("example/RepetitionCode.jl")
+[ Info: Initailization Stage
+Encoded Stabilizer: Bool[0 0 0 0 1 0 0 0; 0 0 0 0 1 1 0 0; 0 0 0 0 0 1 1 0; 0 0 0 0 0 0 1 1]
+Expected Len(phases) = 8,; Got 8
+ρ after stabilizer : SymStabilizerState(0x00000004, UInt64[0x0000000000000001 0x0000000000000002 0x0000000000000004 0x0000000000000008 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000; 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000001 0x0000000000000002 0x0000000000000004 0x0000000000000008 0x0000000000000000], Z3.ExprAllocated[#b0, #b0, #b0, #b0, lx, lx, lx, lx, #b0], Z3.ContextAllocated(Ptr{Nothing} @0x000000000a8b7c40))
+NUM X errors : 1
+  0.001512 seconds (441 allocations: 45.266 KiB)
+[ Info: Symbolic Execution Stage
+  0.133140 seconds (121.17 k allocations: 8.052 MiB, 94.28% compilation time)
+[ Info: SMT Solver Stage
+Slv after pre-cond reset: 
+Conjecture by reduce: (and (= X_error_1 #b0)
+     (= (bvxor X_error_2 r_2) #b0)
+     (= (bvxor X_error_3 r_3) #b0)
+     (= (bvxor X_error_4 r_4) #b0))
+A1: (bvsle (bvadd (concat #b00 X_error_1)
+              (concat #b00 X_error_2)
+              (concat #b00 X_error_3)
+              (concat #b00 X_error_4))
+       #b001)
+A3: (and true
+     true
+     (= (bvxor X_error_1 X_error_2 r_1 r_2) #b0)
+     (= (bvxor X_error_2 X_error_3 r_2 r_3) #b0)
+     (= (bvxor X_error_3 X_error_4 r_3 r_4) #b0)
+     (bvsle (bvadd (concat #b00 r_1)
+                   (concat #b00 r_2)
+                   (concat #b00 r_3)
+                   (concat #b00 r_4))
+            #b001))
+[ Info: There exist some allowed errors that the program cannot correct
+[ Info: The assignment that generated the bug has been written to ./_temp_check_equivalence_.output
+  0.022094 seconds (798 allocations: 428.180 KiB)
+nq all init qse smt
+4 0.1571362018585205 0.00162506103515625 0.13335895538330078 0.022152185440063477

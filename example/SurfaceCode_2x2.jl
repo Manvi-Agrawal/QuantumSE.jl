@@ -7,24 +7,16 @@ using Z3
 ctx = Context()
 
 function _xadj(d, q_idx)
-    if q_idx == 1
-        return [2]
-    elseif q_idx == 2
+    if q_idx == 2
         return [1, 4]
-    elseif q_idx == 4
-        return [2]
     else
         return [3]
     end
 end
 
 function _zadj(d, q_idx)
-    if q_idx == 1
-        return [3]
-    elseif q_idx == 3
+    if q_idx == 3
         return [1, 4]
-    elseif q_idx == 4
-        return [3]
     else
         return []
     end
@@ -121,60 +113,20 @@ function check_toric_decoder(d::Integer)
         num_qubits = d*d
 
         # 4x4 matrix
-	    stabilizer = fill(false, num_qubits, 2*d)
+	    # stabilizer = fill(false, num_qubits, 2*d)
 
-        # X1  on D1
-        stabilizer[1, 0+1] = true
-        # Z1 on D1
-        stabilizer[1, 2+1] = true
+        stabilizer = [
+        true   true   true   true      false  false  false  false;  
+        false  false  false  false     true   true   true   true;  
+        true   false  true  false      false  false  false  false;  
+        false  false  false  false      false  true  false  true]
 
-        # X1  on A1(aka q2)
-        stabilizer[2, 0+1] = true
-        # X2 on A1
-        stabilizer[2, 0+2] = true
-
-        # Z1  on A2(aka q3)
-        stabilizer[3, 2+1] = true
-        # Z2 on A2
-        stabilizer[3, 2+2] = true
-
-        # X2 on D2
-        stabilizer[4, 0+2] = true
-        # Z2 on D2
-        stabilizer[4, 2+2] = true
-
-	    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
-	    # phases = fill(false, num_qubits)
+	    phases = fill( _bv_val(ctx, 0), num_qubits)
 
 	    lx = _bv_const(ctx, "lx")
 	    lz = _bv_const(ctx, "lz")
 
         print("Stabilizer init: $(stabilizer)")
-
-        # [
-        # X1 X2 Z1 Z2
-        # 1  0  1  0; D1
-        # 1  1  0  0; A1
-        # 0  0  1  1; A2
-        # 0  1  0  1; D2
-        # ]
-
-         # [
-        # X1 X2 X3 X4     Z1 Z2 Z3 Z4
-        # 1  1  1  1      0  0  0  0  
-        # 0  0  0  0      1  1  1  1  
-        # 1  0  1  0      0  0  0  0  
-        # 0  0  0  0      0  1  0  1  
-        # ]
-
-        
-        # [
-        # X1 X2 X3 X4  Z1 Z2 Z3 Z4
-        # 1  0  0 0     1  0 0 0   D1
-        # 1  1  0 0     0  0 0 0   A1
-        # 0  0  0 0     1  1 0 0   A2
-        # 0  1  0 0     0  1 0 0   D2
-        # ]
 
         ρ01 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ1 = copy(ρ01)
@@ -191,41 +143,49 @@ function check_toric_decoder(d::Integer)
             (:mwpm, mwpm)
         ])
 
-        # num_x_errors = 0
-        # x_errors = inject_errors(ρ1, "X")
-        # ϕ_x1 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
+        # σ = CState([
+        # ])
+
+        num_x_errors = 0
+        x_errors = inject_errors(ρ1, "X")
+        ϕ_x1 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
 
 
 
         # x_errors = inject_errors(ρ2, "X")
         # ϕ_x2 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
 
+        decoder = toric_decoder(d)
 
+        println("Decoder created")
 
-        cfg1 = SymConfig(toric_decoder(d), σ, ρ1)
+        cfg1 = SymConfig(decoder, σ, ρ1)
+
+        println("Sym config created")
+
     end
 
     @info "Symbolic Execution Stage"
     t1 = time()
-    begin
-        cfgs1 = QuantSymEx(cfg1)
-    end
+    # begin
+    #     cfgs1 = QuantSymEx(cfg1)
+    # end
 
     @info "SMT Solver Stage"
     t2 = time()
     begin
         res = true
-        for cfg in cfgs1
-            if !check_state_equivalence(
-                cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z1=#, cfg.ϕ[1], cfg.ϕ[2]),
-                `bitwuzla --smt-comp-mode true -rwl 0 -S kissat`
-                #`bitwuzla --smt-comp-mode true -S kissat`
-                #`bitwuzla --smt-comp-mode true -rwl 0`
-               )
-                res = false
-                break
-            end
+        # for cfg in cfgs1
+        if !check_state_equivalence(
+            ρ01, ρ01, (ϕ_x1 #=& ϕ_z1=#, cfg1.ϕ[1], cfg1.ϕ[2]),
+            `bitwuzla --smt-comp-mode true -rwl 0 -S kissat`
+            #`bitwuzla --smt-comp-mode true -S kissat`
+            #`bitwuzla --smt-comp-mode true -rwl 0`
+            )
+            res = false
+            # break
         end
+        # end
     end
 
     t3 = time()
@@ -238,5 +198,5 @@ end
 # println(io, "nq all init qse smt")
 d=2
 res, all, init, qse, smt = check_toric_decoder(d)
-println("nq all init qse smt")
-println("$(nq) $(all) $(init) $(qse) $(smt)")
+println("d all init qse smt")
+println("$(d) $(all) $(init) $(qse) $(smt)")

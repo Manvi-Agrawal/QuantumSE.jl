@@ -1,0 +1,281 @@
+include("example/ToricCode.jl")
+nq all init qse smt
+[ Info: Initailization Stage
+Encoded Stabilizer 1: 
+Bool[
+    1 0 1 0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    1 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 1 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 0 0 1 0 1 0 0 0 1 0 0 1 0 0 0 0 0 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 0 0 1 1 0 0 0 0 0 1 0 0 1 0 0 0 0 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 0 0 0 1 1 0 0 0 0 0 1 0 0 1 0 0 0 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 0 0 0 0 0 1 0 1 0 0 0 1 0 0 1 0 0 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0 1 0 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 0 1 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 || 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 1 0 0 1 0 0 0 0 0 1 1 0 0 0 0 0 0 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 0 1 0 0 1 0 0 0 0 0 1 1 0 0 0 0 0 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 0 0 1 0 0 1 0 0 0 1 0 1 0 0 0 0 0 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 0 0 0 1 0 0 1 0 0 0 0 0 1 1 0 0 0 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 0 0 0 0 1 0 0 1 0 0 0 0 0 1 1 0 0 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 0 0 0 0 0 1 0 0 1 0 0 0 1 0 1 0 0 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1 0;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1;
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 || 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 1]
+
+
+
+
+Encoded Stabilizer 2: Bool[1 0 1 0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 1 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 1 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 0 1 0 1 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 0 1 1 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 0 0 1 1 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 1 0 1 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 1 1 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 1 1 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 1 1 0 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 1 0 1 0 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 1 1 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 1 1 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 1 0 1 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+[ Info: Symbolic Execution Stage
+[ Info: SMT Solver Stage
+Slv after pre-cond reset: 
+Conjecture by reduce: (and (= (bvxor r_X_1 r_X_6 r_X_9 r_X_11 r_X_12 r_X_17 r_X_18) #b0)
+     (= (bvxor r_X_2 r_X_6 r_X_9 r_X_12 r_X_18) #b0)
+     (= (bvxor r_X_13 r_X_14 r_X_15 r_X_16 r_X_17 r_X_18) #b0)
+     (= (bvxor r_X_4 r_X_6 r_X_11 r_X_12 r_X_14 r_X_15) #b0)
+     (= (bvxor r_X_5 r_X_6 r_X_12 r_X_15) #b0)
+     (= (bvxor r_X_10 r_X_11 r_X_12 r_X_16 r_X_17 r_X_18) #b0)
+     (= (bvxor r_X_7 r_X_9 r_X_14 r_X_15 r_X_17 r_X_18) #b0)
+     (= (bvxor r_X_8 r_X_9 r_X_15 r_X_18) #b0)
+     (= (bvxor r_X_3 r_X_6 r_X_9) #b0)
+     (= (bvxor X_error_1 X_error_4 X_error_10 X_error_11 r_Z_4 r_Z_10 r_Z_11)
+        #b0)
+     (= (bvxor X_error_1
+               X_error_2
+               X_error_4
+               X_error_5
+               X_error_10
+               X_error_12
+               r_Z_2
+               r_Z_4
+               r_Z_5
+               r_Z_10
+               r_Z_12)
+        #b0)
+     (= (bvxor X_error_1
+               X_error_2
+               X_error_3
+               X_error_4
+               X_error_5
+               X_error_6
+               r_Z_2
+               r_Z_3
+               r_Z_4
+               r_Z_5
+               r_Z_6)
+        #b0)
+     (= (bvxor X_error_4
+               X_error_5
+               X_error_7
+               X_error_8
+               X_error_13
+               X_error_15
+               r_Z_4
+               r_Z_5
+               r_Z_7
+               r_Z_8
+               r_Z_13
+               r_Z_15)
+        #b0)
+     (= (bvxor X_error_4
+               X_error_7
+               X_error_13
+               X_error_14
+               r_Z_4
+               r_Z_7
+               r_Z_13
+               r_Z_14)
+        #b0)
+     (= (bvxor X_error_1
+               X_error_2
+               X_error_3
+               X_error_7
+               X_error_8
+               X_error_9
+               r_Z_2
+               r_Z_3
+               r_Z_7
+               r_Z_8
+               r_Z_9)
+        #b0)
+     (= (bvxor X_error_10 X_error_13 X_error_16 r_Z_10 r_Z_13 r_Z_16) #b0)
+     (= (bvxor X_error_1
+               X_error_7
+               X_error_10
+               X_error_13
+               X_error_17
+               r_Z_7
+               r_Z_10
+               r_Z_13
+               r_Z_17)
+        #b0)
+     (= (bvxor X_error_1
+               X_error_2
+               X_error_7
+               X_error_8
+               X_error_10
+               X_error_13
+               X_error_18
+               r_Z_2
+               r_Z_7
+               r_Z_8
+               r_Z_10
+               r_Z_13
+               r_Z_18)
+        #b0))
+A1: (= (bvadd (concat #b00000 X_error_1)
+          (concat #b00000 X_error_2)
+          (concat #b00000 X_error_3)
+          (concat #b00000 X_error_4)
+          (concat #b00000 X_error_5)
+          (concat #b00000 X_error_6)
+          (concat #b00000 X_error_7)
+          (concat #b00000 X_error_8)
+          (concat #b00000 X_error_9)
+          (concat #b00000 X_error_10)
+          (concat #b00000 X_error_11)
+          (concat #b00000 X_error_12)
+          (concat #b00000 X_error_13)
+          (concat #b00000 X_error_14)
+          (concat #b00000 X_error_15)
+          (concat #b00000 X_error_16)
+          (concat #b00000 X_error_17)
+          (concat #b00000 X_error_18))
+   #b000001)
+A3: (and true
+     true
+     (= (bvxor #b0 r_X_10 r_X_3 r_X_1 r_X_16) #b0)
+     (= (bvxor #b0 r_X_11 r_X_1 r_X_2 r_X_17) #b0)
+     (= (bvxor #b0 r_X_12 r_X_2 r_X_3 r_X_18) #b0)
+     (= (bvxor #b0 r_X_13 r_X_6 r_X_4 r_X_10) #b0)
+     (= (bvxor #b0 r_X_14 r_X_4 r_X_5 r_X_11) #b0)
+     (= (bvxor #b0 r_X_15 r_X_5 r_X_6 r_X_12) #b0)
+     (= (bvxor #b0 r_X_16 r_X_9 r_X_7 r_X_13) #b0)
+     (= (bvxor #b0 r_X_17 r_X_7 r_X_8 r_X_14) #b0)
+     (= (bvxor #b0 r_X_18 r_X_8 r_X_9 r_X_15) #b0)
+     (bvsle (bvadd (concat #b00000 r_X_1)
+                   (concat #b00000 r_X_2)
+                   (concat #b00000 r_X_3)
+                   (concat #b00000 r_X_4)
+                   (concat #b00000 r_X_5)
+                   (concat #b00000 r_X_6)
+                   (concat #b00000 r_X_7)
+                   (concat #b00000 r_X_8)
+                   (concat #b00000 r_X_9)
+                   (concat #b00000 r_X_10)
+                   (concat #b00000 r_X_11)
+                   (concat #b00000 r_X_12)
+                   (concat #b00000 r_X_13)
+                   (concat #b00000 r_X_14)
+                   (concat #b00000 r_X_15)
+                   (concat #b00000 r_X_16)
+                   (concat #b00000 r_X_17)
+                   (concat #b00000 r_X_18))
+            #b000001)
+     true
+     (= (bvxor #b0
+               X_error_1
+               X_error_4
+               X_error_10
+               X_error_11
+               r_Z_4
+               r_Z_10
+               r_Z_11
+               r_Z_1)
+        #b0)
+     (= (bvxor X_error_11
+               X_error_2
+               X_error_5
+               X_error_12
+               r_Z_5
+               r_Z_11
+               r_Z_12
+               r_Z_2)
+        #b0)
+     (= (bvxor X_error_10
+               X_error_12
+               X_error_3
+               X_error_6
+               r_Z_6
+               r_Z_12
+               r_Z_10
+               r_Z_3)
+        #b0)
+     (= (bvxor #b0
+               X_error_4
+               X_error_7
+               X_error_13
+               X_error_14
+               r_Z_7
+               r_Z_13
+               r_Z_14
+               r_Z_4)
+        #b0)
+     (= (bvxor X_error_5
+               X_error_8
+               X_error_15
+               X_error_14
+               r_Z_8
+               r_Z_14
+               r_Z_15
+               r_Z_5)
+        #b0)
+     (= (bvxor X_error_6
+               X_error_13
+               X_error_15
+               X_error_9
+               r_Z_9
+               r_Z_15
+               r_Z_13
+               r_Z_6)
+        #b0)
+     (= (bvxor X_error_16
+               X_error_1
+               X_error_7
+               X_error_17
+               r_Z_1
+               r_Z_16
+               r_Z_17
+               r_Z_7)
+        #b0)
+     (= (bvxor X_error_17
+               X_error_2
+               X_error_8
+               X_error_18
+               r_Z_2
+               r_Z_17
+               r_Z_18
+               r_Z_8)
+        #b0)
+     (= (bvxor X_error_3
+               X_error_9
+               X_error_16
+               X_error_18
+               r_Z_3
+               r_Z_18
+               r_Z_16
+               r_Z_9)
+        #b0)
+     (bvsle (bvadd (concat #b00000 r_Z_1)
+                   (concat #b00000 r_Z_2)
+                   (concat #b00000 r_Z_3)
+                   (concat #b00000 r_Z_4)
+                   (concat #b00000 r_Z_5)
+                   (concat #b00000 r_Z_6)
+                   (concat #b00000 r_Z_7)
+                   (concat #b00000 r_Z_8)
+                   (concat #b00000 r_Z_9)
+                   (concat #b00000 r_Z_10)
+                   (concat #b00000 r_Z_11)
+                   (concat #b00000 r_Z_12)
+                   (concat #b00000 r_Z_13)
+                   (concat #b00000 r_Z_14)
+                   (concat #b00000 r_Z_15)
+                   (concat #b00000 r_Z_16)
+                   (concat #b00000 r_Z_17)
+                   (concat #b00000 r_Z_18))
+            #b000001))
+[ Info: There exist some allowed errors that the program cannot correct
+[ Info: The assignment that generated the bug has been written to ./_temp_check_equivalence_.output
+3/27: 18 1.4607360363006592 0.2015080451965332 1.1570990085601807 0.10212898254394531
+

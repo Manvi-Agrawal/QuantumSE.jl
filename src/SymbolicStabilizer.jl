@@ -24,6 +24,7 @@ struct SymStabilizerState <: AbstractSymQuantumState
 
     SymStabilizerState(num_qubits::Integer, Tableau::Matrix{Bool}, phases::Vector{Z3.ExprAllocated}, ctx::Z3.ContextAllocated) = begin
         @assert size(Tableau) == (2*num_qubits, 2*num_qubits)
+        println("Expected Len(phases) = $(2*num_qubits),; Got $(length(phases))")
         @assert length(phases) == 2*num_qubits
         
         len = num_qubits>>6 + 1
