@@ -110,14 +110,22 @@ end
 
 @qprog toric_z_m (d, idx) begin
     b = _zadj(d, idx)
-    
-    CNOT(b[1], b[2])
-    CNOT(b[3], b[4])
-    CNOT(b[2], b[4])
-    res = M(b[4])
-    CNOT(b[2], b[4])
-    CNOT(b[3], b[4])
-    CNOT(b[1], b[2])
+
+    if length(b) == 4
+        CNOT(b[1], b[2])
+        CNOT(b[3], b[4])
+        CNOT(b[2], b[4])
+        res = M(b[4])
+        CNOT(b[2], b[4])
+        CNOT(b[3], b[4])
+        CNOT(b[1], b[2])
+    elseif length(b) == 2
+        CNOT(b[1], b[2])
+        res = M(b[1])
+        CNOT(b[1], b[2])
+    else
+        res = -100
+    end
     
     res
 end
@@ -125,24 +133,38 @@ end
 
 @qprog toric_x_m (d, idx) begin
     b = _xadj(d, idx)
-    
-    CNOT(b[1], b[2])
-    CNOT(b[3], b[4])
-    CNOT(b[3], b[1])
-    H(b[3])
-    res = M(b[3])
-    H(b[3])
-    CNOT(b[3], b[1])
-    CNOT(b[3], b[4])
-    CNOT(b[1], b[2])
+
+    if length(b) == 4
+        CNOT(b[1], b[2])
+        CNOT(b[3], b[4])
+        CNOT(b[3], b[1])
+        H(b[3])
+        res = M(b[3])
+        H(b[3])
+        CNOT(b[3], b[1])
+        CNOT(b[3], b[4])
+        CNOT(b[1], b[2])
+
+    elseif length(b) == 2
+        CNOT(b[1], b[2])
+        H(b[1])
+        res = M(b[1])
+        H(b[1])
+        CNOT(b[1], b[2])
+    else
+        res = -100
+    end
     
     res
 end
 
 @qprog toric_decoder (d) begin
 
-    s_x = [toric_x_m(d, j) for j in 1:d*d]
-    s_z = [toric_z_m(d, j) for j in 1:d*d]
+    xq = [1, 2, 4, 8]
+    zq = [1, 3, 4, 5]
+
+    s_x = [toric_x_m(d, j) for j in xq]
+    s_z = [toric_z_m(d, j) for j in zq]
     
     r_x = mwpm(d, s_x, "X")
     r_z = mwpm(d, s_z, "Z")
@@ -153,9 +175,9 @@ end
     end
 
     # a strange bug
-    e = reduce(&, r_z[1:(d-1)÷2])
+    # e = reduce(&, r_z[1:(d-1)÷2])
 
-    sX(1, e)
+    # sX(1, e)
 
 end
 
@@ -283,6 +305,6 @@ end
 
 d = 3
 res, all, init, qse, smt = check_toric_decoder(d)
-println("nq all init qse smt")
-println("$(d)/27: $(d*d*2) $(all) $(init) $(qse) $(smt)")
+println("d: res nq all init qse smt")
+println("$(d): $(res) $(d*d*2) $(all) $(init) $(qse) $(smt)")
 
