@@ -108,7 +108,7 @@ function toric_lz2(d::Integer)
 	s
 end
 
-@qprog toric_z_m (d, idx) begin
+@qprog surface_code_z_m (d, idx) begin
     b = _zadj(d, idx)
 
     if length(b) == 4
@@ -131,7 +131,7 @@ end
 end
 
 
-@qprog toric_x_m (d, idx) begin
+@qprog surface_code_x_m (d, idx) begin
     b = _xadj(d, idx)
 
     if length(b) == 4
@@ -158,13 +158,13 @@ end
     res
 end
 
-@qprog toric_decoder (d) begin
+@qprog surface_code_decoder (d) begin
 
     xq = [1, 2, 4, 8]
     zq = [1, 3, 4, 5]
 
-    s_x = [toric_x_m(d, j) for j in xq]
-    s_z = [toric_z_m(d, j) for j in zq]
+    s_x = [surface_code_x_m(d, j) for j in xq]
+    s_z = [surface_code_z_m(d, j) for j in zq]
     
     r_x = mwpm(d, s_x, "X")
     r_z = mwpm(d, s_z, "Z")
@@ -191,7 +191,7 @@ function toric_x_s(d::Integer, idx::Integer)
 	s
 end
 
-function check_toric_decoder(d::Integer)
+function check_surface_code_decoder(d::Integer)
 
     d = 3
 
@@ -252,9 +252,9 @@ function check_toric_decoder(d::Integer)
         # ρ2 = copy(ρ02)
 
         σ = CState([(:d, d),
-            (:toric_decoder, toric_decoder),
-            (:toric_z_m, toric_z_m),
-            (:toric_x_m, toric_x_m),
+            (:surface_code_decoder, surface_code_decoder),
+            (:surface_code_z_m, surface_code_z_m),
+            (:surface_code_x_m, surface_code_x_m),
             (:_xadj, _xadj),
             (:_zadj, _zadj),
             (:ctx, ctx),
@@ -267,8 +267,8 @@ function check_toric_decoder(d::Integer)
 
 	  
 
-        cfg1 = SymConfig(toric_decoder(d), σ, ρ1)
-        # cfg2 = SymConfig(toric_decoder(d), σ, ρ2)
+        cfg1 = SymConfig(surface_code_decoder(d), σ, ρ1)
+        # cfg2 = SymConfig(surface_code_decoder(d), σ, ρ2)
     end
 
     @info "Symbolic Execution Stage"
@@ -301,10 +301,10 @@ function check_toric_decoder(d::Integer)
     res, t2-t0, t1-t0, t2-t1, t3-t2
 end
 
-# check_toric_decoder(3) # precompile time
+# check_surface_code_decoder(3) # precompile time
 
 d = 3
-res, all, init, qse, smt = check_toric_decoder(d)
+res, all, init, qse, smt = check_surface_code_decoder(d)
 println("d: res nq all init qse smt")
 println("$(d): $(res) $(d*d*2) $(all) $(init) $(qse) $(smt)")
 
