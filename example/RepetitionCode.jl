@@ -10,6 +10,9 @@ function mwpm(n::Integer, s)
     # pre-condition
     ϕ₁ = simplify(reduce(⊻, s)) == _bv_val(ctx, 0)
 
+    println("pre-condition 1: $(ϕ₁)")
+
+
     # post-condition
     ϕ₂ = bool_val(ctx, true)
     r = [_bv_const(ctx, "r_$(j)") for j in 1:n]
@@ -18,6 +21,9 @@ function mwpm(n::Integer, s)
     end
 
     ϕ₃ = (sum( (x -> concat(bv_val(ctx, 0, _len2(n)), x)).(r) ) <= bv_val(ctx, (n-1)÷2, _len2(n)+1))
+
+    println("post-condition 2: $(ϕ₂)")
+    println("post-condition 3: $(ϕ₃)")
 
     (r, ϕ₁, ϕ₂ & ϕ₃)
 end
@@ -110,9 +116,16 @@ function check_repetition_decoder(n)
         ρ₀ = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ = copy(ρ₀)
 
-        println("ρ after stabilizer : $(ρ)")
+        # println("ρ after stabilizer : $(ρ)")
 
-        num_x_errors = (n-1)÷2
+        println("Tableau after encoded stabilizer init:")
+        print_full_tableau(ρ)
+        println("---------------------------------------------------")
+
+
+        # num_x_errors = (n-1)÷2
+        num_x_errors = 0
+
         println("NUM X errors : $(num_x_errors)")
 
         x_errors = inject_errors(ρ, "X")
@@ -123,6 +136,10 @@ function check_repetition_decoder(n)
         #ϕ_z = _sum(ctx, z_errors, num_qubits) <= bv_val(ctx, num_z_errors, _len2(num_qubits)+1)
 
         cfg0 = SymConfig(repetition_decoder(n), σ, ρ)
+
+        println("Tableau after symconfig init:")
+        print_full_tableau(cfg0.ρ)
+        println("---------------------------------------------------")
     end
 
     @info "Symbolic Execution Stage"
@@ -134,6 +151,10 @@ function check_repetition_decoder(n)
     @time begin
         res = true
         for cfg in cfgs
+            println("Tableau in config:")
+            print_full_tableau(cfg.ρ)
+            println("---------------------------------------------------")
+
             if !check_state_equivalence(
                 cfg.ρ, ρ₀, (ϕ_x #=& ϕ_z=#, cfg.ϕ[1], cfg.ϕ[2]),
                 `bitwuzla --smt-comp-mode true -rwl 0 -S kissat`)
@@ -152,5 +173,5 @@ end
 
 nq = 3
 res, all, init, qse, smt = check_repetition_decoder(nq)
-println("nq all init qse smt")
-println("$(nq) $(all) $(init) $(qse) $(smt)")
+println("nq: res all init qse smt")
+println("$(nq): $(res) $(all) $(init) $(qse) $(smt)")

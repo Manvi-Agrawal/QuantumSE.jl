@@ -268,6 +268,28 @@ function from_css_code(HX, HZ, ctx::Z3.ContextAllocated)
     ρ1, ρ2, dx, dz
 end
 
+function print_full_tableau_to_file(q::SymStabilizerState, io)
+    len = size(q.xzs, 1)÷2
+    
+    for i in 1:2*q.num_qubits
+        for j in 1:q.num_qubits
+            j6 = _mod(j)
+            pwj = _rem(j)
+            print(io, (q.xzs[j6,i]&pwj)>>((j-1)&(0x3f)))
+        end
+        for j in 1:q.num_qubits
+            j6 = _mod(j)
+            pwj = _rem(j)
+            print(io, (q.xzs[j6+len,i]&pwj)>>((j-1)&(0x3f)))
+        end
+        println(io, " | ", simplify(q.phases[i]))
+        if i == q.num_qubits
+            print(io, "\n")
+        end
+    end
+    nothing
+end
+
 function print_full_tableau(q::SymStabilizerState)
     len = size(q.xzs, 1)÷2
     
@@ -516,7 +538,7 @@ function check_state_equivalence(q1::SymStabilizerState, q2::SymStabilizerState,
     _canonicalize_gott!(q2)
 
     if ~_equal(q1.xzs, q2.xzs, ranges)
-        @info "The Stabilizer does not match, the program is wrong even without error insertion"
+        @error "The Stabilizer does not match, the program is wrong even without error insertion"
         return false
     end
 
@@ -550,7 +572,7 @@ function check_state_equivalence(q1::SymStabilizerState, q2::SymStabilizerState,
             open(smt2_file_name*".output", "w") do io
                 println(io, res_string)
             end
-            @info "The assignment that generates the bug has been written to ./$(smt2_file_name).output"
+            @error "The assignment that generates the bug has been written to ./$(smt2_file_name).output"
             return false
         end
     end
@@ -592,7 +614,7 @@ function check_state_equivalence(q1::SymStabilizerState, q2::SymStabilizerState,
             open(smt2_file_name*".output", "w") do io
                 println(io, res_string)
             end
-            @info "The assignment that generated the bug has been written to ./$(smt2_file_name).output"
+            @error "The assignment that generated the bug has been written to ./$(smt2_file_name).output"
             return false
         end
     end

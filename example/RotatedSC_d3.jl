@@ -236,7 +236,7 @@ function check_surface_code_decoder(d::Integer)
 	    # stabilizer[2*d*d,:] = toric_lz1(d)
 	    phases[2*d*d] = lz
 
-        print("Encoded Stabilizer 1: $(stabilizer)\n")
+        # print("Encoded Stabilizer 1: $(stabilizer)\n")
 
         ρ01 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ1 = copy(ρ01)
@@ -266,20 +266,21 @@ function check_surface_code_decoder(d::Integer)
         ϕ_x1 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
 
 	  
-
-        cfg1 = SymConfig(surface_code_decoder(d), σ, ρ1)
+        decoder = surface_code_decoder(d)
+        cfg1 = SymConfig(decoder, σ, ρ1)
         # cfg2 = SymConfig(surface_code_decoder(d), σ, ρ2)
     end
 
     @info "Symbolic Execution Stage"
     t1 = time()
     begin
-        # cfgs1 = QuantSymEx(cfg1)
+        cfgs1 = QuantSymEx(cfg1)
         # cfgs2 = QuantSymEx(cfg2)
     end
 
     @info "SMT Solver Stage"
     t2 = time()
+
     begin
         res = true
         # for cfg in cfgs1

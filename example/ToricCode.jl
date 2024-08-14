@@ -3,6 +3,8 @@ using Z3
 
 ctx = Context()
 
+
+
 function _xadj(d, idx)
     ai = (idx-1)÷d
     bi = (idx-1)%d
@@ -22,6 +24,8 @@ function mwpm(d::Integer, s, s_type)
     # pre-condition
     ϕ₁ = simplify(reduce(⊻, s)) == _bv_val(ctx, 0)
 
+    println("precondition 1: $(ϕ₁)")
+
     # post-condition
     ϕ₂ = bool_val(ctx, true)
     adj = s_type == "X" ? _xadj : _zadj
@@ -31,6 +35,9 @@ function mwpm(d::Integer, s, s_type)
     end
 
     ϕ₃ = (sum( (x -> concat(bv_val(ctx, 0, _len2(2*d*d)), x)).(r) ) <= bv_val(ctx, (d-1)÷2, _len2(2*d*d)+1))
+
+    println("post-condition 2: $(ϕ₂)")
+    println("post-condition 3: $(ϕ₃)")
 
     (r, ϕ₁, ϕ₂ & ϕ₃)
 end
@@ -145,7 +152,7 @@ end
 
 end
 
-function check_toric_decoder(d::Integer)
+function check_toric_decoder(d::Integer, io)
 
     @info "Initailization Stage"
     t0 = time()
@@ -172,6 +179,10 @@ function check_toric_decoder(d::Integer)
         ρ01 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ1 = copy(ρ01)
 
+        println(io, "Tableau after S1 init:")
+        print_full_tableau_to_file(ρ1, io)
+        println("---------------------------------------------------")
+
         stabilizer[d*d,:] = toric_lx2(d)
 	    phases[d*d] = lx
 	    stabilizer[2*d*d,:] = toric_lz2(d)
@@ -179,6 +190,10 @@ function check_toric_decoder(d::Integer)
 
         ρ02 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ2 = copy(ρ02)
+
+        println(io, "Tableau after S2 init:")
+        print_full_tableau_to_file(ρ2, io)
+        println("---------------------------------------------------")
 
         σ = CState([(:d, d),
             (:toric_decoder, toric_decoder),
@@ -206,21 +221,27 @@ function check_toric_decoder(d::Integer)
         #ϕ_z2 = _sum(ctx, z_errors, num_qubits) == bv_val(ctx, num_z_errors, _len2(num_qubits)+1)
 
         cfg1 = SymConfig(toric_decoder(d), σ, ρ1)
-        cfg2 = SymConfig(toric_decoder(d), σ, ρ2)
+        # cfg2 = SymConfig(toric_decoder(d), σ, ρ2)
+        println(io, "Tableau after error inj and symconfig--1 init:")
+        print_full_tableau_to_file(cfg1.ρ, io)
+        println("---------------------------------------------------")
     end
 
     @info "Symbolic Execution Stage"
     t1 = time()
-    # begin
-    #     cfgs1 = QuantSymEx(cfg1)
-    #     cfgs2 = QuantSymEx(cfg2)
-    # end
+    begin
+        cfgs1 = QuantSymEx(cfg1)
+        # cfgs2 = QuantSymEx(cfg2)
+    end
 
     @info "SMT Solver Stage"
     t2 = time()
     begin
         res = true
-        # for cfg in cfgs1
+        for cfg in cfgs1
+            println(io, "Tableau in cfg1 collection after QuantSymEx:")
+            print_full_tableau_to_file(cfg.ρ, io)
+            println("---------------------------------------------------")
             if !check_state_equivalence(
                 ρ01, ρ01, (ϕ_x1 #=& ϕ_z1=#, cfg1.ϕ[1], cfg1.ϕ[2]),
                 `bitwuzla --smt-comp-mode true -rwl 0 -S kissat`
@@ -228,7 +249,7 @@ function check_toric_decoder(d::Integer)
                 #`bitwuzla --smt-comp-mode true -rwl 0`
                )
                 res = false
-                # break
+                break
             end
         end
 
@@ -239,14 +260,14 @@ function check_toric_decoder(d::Integer)
     res, t3-t0, t1-t0, t2-t1, t3-t2
 end
 
-check_toric_decoder(3) # precompile time
+# check_toric_decoder(3) # precompile time
 
-open("toric_code.dat", "w") do io
-  println(io, "nq all init qse smt")
-  println("nq all init qse smt")
-  for d in 4:4
-    res, all, init, qse, smt = check_toric_decoder(d)
-    println(io, "$(d*d*2) $(all) $(init) $(qse) $(smt)")
-    println("$(d)/27: $(d*d*2) $(all) $(init) $(qse) $(smt)")
+open("toric_run.txt", "w") do io
+  println(io, "nq res all init qse smt")
+  println("nq res all init qse smt")
+  for d in 3:3
+    res, all, init, qse, smt = check_toric_decoder(d, io)
+    println(io, "$(d) : $(res) $(d*d*2) $(all) $(init) $(qse) $(smt)")
+    println("$(d): $(res) $(d*d*2) $(all) $(init) $(qse) $(smt)")
   end
 end
