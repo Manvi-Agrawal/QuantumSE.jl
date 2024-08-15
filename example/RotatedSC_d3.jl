@@ -224,17 +224,17 @@ function check_surface_code_decoder(d::Integer)
 	    lx = _bv_const(ctx, "lx")
 	    lz = _bv_const(ctx, "lz")
 
-	    @simd for i in 1:d*d-1
+	    @simd for i in 1:num_qubits
 	    	# stabilizer[i,:] = toric_x_s(d, i)
 	    	# stabilizer[i+d*d,:] = toric_z_s(d, i)
 	    	phases[i] = _bv_val(ctx, 0)
-	    	phases[i+d*d] = _bv_val(ctx, 0)
+	    	# phases[i+d*d] = _bv_val(ctx, 0)
 	    end
 
 	    # stabilizer[d*d,:] = toric_lx1(d)
-	    phases[d*d] = lx
+	    # phases[d*d] = lx
 	    # stabilizer[2*d*d,:] = toric_lz1(d)
-	    phases[2*d*d] = lz
+	    # phases[2*d*d] = lz
 
         # print("Encoded Stabilizer 1: $(stabilizer)\n")
 

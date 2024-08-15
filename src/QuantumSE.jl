@@ -10,7 +10,7 @@ export GF2
 
 include("SymbolicStabilizer.jl")
 export M, X, Y, Z, sX, sY, sZ, S, H, CNOT,
-    SymStabilizerState, from_stabilizer, print_full_tableau, update!, inject_errors, from_css_code,
+    SymStabilizerState, from_stabilizer, print_full_tableau, print_full_tableau_to_file, update!, inject_errors,
     _bv_val, _bv_const, _len2, check_state_equivalence, _sum
 
 include("SymbolicExecution.jl")

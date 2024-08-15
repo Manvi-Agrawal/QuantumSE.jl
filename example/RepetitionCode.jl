@@ -116,7 +116,7 @@ function check_repetition_decoder(n)
         ρ₀ = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ = copy(ρ₀)
 
-        # println("ρ after stabilizer : $(ρ)")
+        println("ρ after stabilizer : $(ρ)")
 
         println("Tableau after encoded stabilizer init:")
         print_full_tableau(ρ)
