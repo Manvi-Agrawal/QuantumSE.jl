@@ -1,7 +1,10 @@
 using QuantumSE
+using LinearAlgebra: I, nullspace, rank
+using SimpleGF2: rref
+using InvertedIndices
 using Z3
 using SparseArrays
-using LinearAlgebra: nullspace
+# using LinearAlgebra: nullspace
 
 ctx = Z3.Context()
 
@@ -137,6 +140,61 @@ end
     sX(1, e)
 end
 
+function logical_operators(H1, H2)
+    n = size(H1,2)
+    X = rref(H1)
+    nx = rank(X)
+    X_idxs = [findfirst(!iszero, X[j,:]) for j in 1:nx]
+    Z = rref(H2[:,Not(X_idxs)])
+    nz = rank(Z)
+    Z_idxs = [[1:n...][Not(X_idxs)][findfirst(!iszero, Z[j,:])] for j in 1:nz]
+    nl = n - nx - nz
+    L = zeros(GF2, nl, n)
+    L[1:nl, X_idxs] = X[1:nx,Not([X_idxs;Z_idxs])]'
+    L[1:nl, Not([X_idxs;Z_idxs])] += I
+    
+    L
+end
+
+function from_css_code(HX, HZ, ctx::Z3.ContextAllocated)
+    n = size(HX, 2)
+
+    X = rref(HX)
+    nx = rank(X)
+    X = X[1:nx,:]
+
+    Z = rref(HZ)
+    nz = rank(Z)
+    Z = Z[1:nz,:]
+
+    LZ = logical_operators(X, Z)
+    LX = logical_operators(Z, X)
+    nl = size(LZ, 1)
+    dx = minimum([length(findall(!iszero, LX[j,:])) for j in 1:nl])
+    dz = minimum([length(findall(!iszero, LZ[j,:])) for j in 1:nl])
+    println("[[n, k, dx, dz]] = [[$(n), $(nl), dx<$(dx), dz<$(dz)]]")
+    
+    stabilizer1 = Matrix{Bool}([[X;LX] zeros(GF2, nx+nl, n);zeros(GF2, nz, n) Z])
+    phases1 = [_bv_val(ctx, 0) for j in 1:n]
+    for j in 1:nl
+        phases1[nx+j] = _bv_const(ctx, "lx$(j)")
+    end
+
+    print("Encoded stabilizer 1: $(stabilizer1)")
+
+    ρ1 = from_stabilizer(n, stabilizer1, phases1, ctx)
+
+    stabilizer2 = Matrix{Bool}([X zeros(GF2, nx, n);zeros(GF2, nz+nl, n) [Z;LZ]])
+    phases2 = [_bv_val(ctx, 0) for j in 1:n]
+    for j in 1:nl
+        phases2[nx+nz+j] = _bv_const(ctx, "lz$(j)")
+    end
+    ρ2 = from_stabilizer(n, stabilizer2, phases2, ctx)
+
+    ρ1, ρ2, dx, dz
+end
+
+
 function check_tanner_decoder(m,k)
     #=
     p = 13
@@ -189,6 +247,8 @@ function check_tanner_decoder(m,k)
 
         ρ01, ρ02, dx, dz = from_css_code(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
         d = 6 #min(dx, dz)
+
+        
 
         ρ1 = copy(ρ01)
         ρ2 = copy(ρ02)
@@ -260,14 +320,14 @@ function check_tanner_decoder(m,k)
     res, t3-t0, t1-t0, t2-t1, t3-t2
 end
 
-check_tanner_decoder(1,1) # precompile time
+# check_tanner_decoder(1,1) # precompile time
 
 open("tanner_code.dat", "w") do io
-  println(io, "nq all init qse smt")
-  println("nq all init qse smt")
-  for k in 1:4
+  println(io, "nq: res all init qse smt")
+  println("nq: res all init qse smt")
+  for k in 1:1
     res, all, init, qse, smt = check_tanner_decoder(1,k)
-    println(io, "$(343*k) $(all) $(init) $(qse) $(smt)")
-    println("$(k)/4: $(343*k) $(all) $(init) $(qse) $(smt)")
+    println(io, "$(343*k): $(res) $(all) $(init) $(qse) $(smt)")
+    println("$(k)/4: $(res)  $(343*k) $(all) $(init) $(qse) $(smt)")
   end
 end

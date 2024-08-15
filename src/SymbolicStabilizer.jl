@@ -32,6 +32,8 @@ struct SymStabilizerState <: AbstractSymQuantumState
         
         @simd for i in 1:2*num_qubits
             for j in 1:num_qubits
+                # @inline _mod(j) = (j-1)>>6 + 1
+                # @inline _rem(j) = UInt64(0x1) << ((j-1)&(0x3f))
                 j6 = _mod(j)
                 pw = _rem(j)
                 if ~iszero(Tableau[i,j])
@@ -215,57 +217,6 @@ function from_stabilizer(num_qubits::Integer, Stabilizer::Matrix{Bool}, phases1:
     _canonicalize_gott!(result)
 
     result
-end
-
-function logical_operators(H1, H2)
-    n = size(H1,2)
-    X = rref(H1)
-    nx = rank(X)
-    X_idxs = [findfirst(!iszero, X[j,:]) for j in 1:nx]
-    Z = rref(H2[:,Not(X_idxs)])
-    nz = rank(Z)
-    Z_idxs = [[1:n...][Not(X_idxs)][findfirst(!iszero, Z[j,:])] for j in 1:nz]
-    nl = n - nx - nz
-    L = zeros(GF2, nl, n)
-    L[1:nl, X_idxs] = X[1:nx,Not([X_idxs;Z_idxs])]'
-    L[1:nl, Not([X_idxs;Z_idxs])] += I
-    
-    L
-end
-
-function from_css_code(HX, HZ, ctx::Z3.ContextAllocated)
-    n = size(HX, 2)
-
-    X = rref(HX)
-    nx = rank(X)
-    X = X[1:nx,:]
-
-    Z = rref(HZ)
-    nz = rank(Z)
-    Z = Z[1:nz,:]
-
-    LZ = logical_operators(X, Z)
-    LX = logical_operators(Z, X)
-    nl = size(LZ, 1)
-    dx = minimum([length(findall(!iszero, LX[j,:])) for j in 1:nl])
-    dz = minimum([length(findall(!iszero, LZ[j,:])) for j in 1:nl])
-    println("[[n, k, dx, dz]] = [[$(n), $(nl), dx<$(dx), dz<$(dz)]]")
-    
-    stabilizer1 = Matrix{Bool}([[X;LX] zeros(GF2, nx+nl, n);zeros(GF2, nz, n) Z])
-    phases1 = [_bv_val(ctx, 0) for j in 1:n]
-    for j in 1:nl
-        phases1[nx+j] = _bv_const(ctx, "lx$(j)")
-    end
-    ρ1 = from_stabilizer(n, stabilizer1, phases1, ctx)
-
-    stabilizer2 = Matrix{Bool}([X zeros(GF2, nx, n);zeros(GF2, nz+nl, n) [Z;LZ]])
-    phases2 = [_bv_val(ctx, 0) for j in 1:n]
-    for j in 1:nl
-        phases2[nx+nz+j] = _bv_const(ctx, "lz$(j)")
-    end
-    ρ2 = from_stabilizer(n, stabilizer2, phases2, ctx)
-
-    ρ1, ρ2, dx, dz
 end
 
 function print_full_tableau_to_file(q::SymStabilizerState, io)
