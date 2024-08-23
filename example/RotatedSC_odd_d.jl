@@ -82,13 +82,14 @@ end
 end
 
 
-@qprog surface_code_decoder (d, x_q, z_q) begin
+@qprog surface_code_decoder (d) begin
     print("Decoder start")
 
     nq = d*d
+    lim = (nq-1)÷2
 
-    s_x = [surface_code_x_m(idx) for idx in x_q]
-    s_z = [surface_code_z_m(idx) for idx in z_q]
+    s_x = [surface_code_x_m(j) for j in 1:lim]
+    s_z = [surface_code_z_m(j) for j in 1:lim]
 
     r_x = css_check(d, s_x, "X", nq, _xadj)
     r_z = css_check(d, s_z, "Z", nq, _zadj)
@@ -103,9 +104,9 @@ end
     end
 
     # a strange bug
-    # e = reduce(&, r_z[1:(d-1)÷2])
+    e = reduce(&, r_z[1:(d-1)÷2])
 
-    # sX(1, e)
+    sX(1, e)
 
     print("Decoder end")
 end
@@ -134,14 +135,14 @@ function check_surface_code_decoder(d::Integer)
         x_2q_down = [ 1+ (d-1)*d + c for c in 1:2:(d-2) ]
         x_2q = vcat(x_2q_up, x_2q_down)
 
-       println("X 2q: $(x_2q)")
+    #    println("X 2q: $(x_2q)")
 
 
         z_2q_right = [ 1 + r*d+ (d-1) for r in 0:2:(d-2) ]
         z_2q_left = [ 1 + r*d for r in 1:2:(d-2) ]
         z_2q = vcat(z_2q_left, z_2q_right)
 
-       println("Z 2q: $(z_2q)")
+    #    println("Z 2q: $(z_2q)")
 
         x_q = vcat(x_4q, x_2q)
         z_q = vcat(z_4q, z_2q)
@@ -150,8 +151,10 @@ function check_surface_code_decoder(d::Integer)
         X_idxs = [ [] for _ in 1:length(x_q)]
         Z_idxs = [ [] for _ in 1:length(z_q)]
 
-        _xadj(i) = [ x for x in X_idxs if x[1] == i][1]
-        _zadj(i) = [ z for z in Z_idxs if z[1] == i][1]
+        #_xadj(i) = [ x for x in X_idxs if x[1] == i][1] # _xadj(2) = Vector(2, 3, 5, 6)
+        _xadj(j) = X_idxs[j]
+        #_zadj(i) = [ z for z in Z_idxs if z[1] == i][1]
+        _zadj(j) = Z_idxs[j]
 
         r = 0
 
@@ -200,7 +203,7 @@ function check_surface_code_decoder(d::Integer)
             stabilizer[num_qubits, idx] = true
         end
         
-        println("Encoded stabilizer : $(stabilizer)")
+        # println("Encoded stabilizer : $(stabilizer)")
 
         # println("X idxs: $(X_idxs)")
         # print("Z idxs: $(Z_idxs)")
@@ -244,7 +247,7 @@ function check_surface_code_decoder(d::Integer)
         ϕ_x1 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
 
 	  
-        decoder = surface_code_decoder(d, x_q, z_q)
+        decoder = surface_code_decoder(d)
         cfg1 = SymConfig(decoder, σ, ρ1)
         # cfg2 = SymConfig(surface_code_decoder(d), σ, ρ2)
     end
@@ -261,18 +264,18 @@ function check_surface_code_decoder(d::Integer)
 
     begin
         res = true
-        # for cfg in cfgs1
+        for cfg in cfgs1
         if !check_state_equivalence(
-            ρ01, ρ01, (ϕ_x1 #=& ϕ_z1=#, cfg1.ϕ[1], cfg1.ϕ[2]),
-            # cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z2=#, cfg.ϕ[1], cfg.ϕ[2]),
+            # ρ01, ρ01, (ϕ_x1 #=& ϕ_z1=#, cfg1.ϕ[1], cfg1.ϕ[2]),
+            cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z2=#, cfg.ϕ[1], cfg.ϕ[2]),
             `bitwuzla --smt-comp-mode true -rwl 0 -S kissat`
             #`bitwuzla --smt-comp-mode true -S kissat`
             #`bitwuzla --smt-comp-mode true -rwl 0`
             )
             res = false
-            # break
+            break
         end
-        # end
+        end
 
     end
 
@@ -282,12 +285,13 @@ function check_surface_code_decoder(d::Integer)
 end
 
 check_surface_code_decoder(3) # precompile time
-# open("surface_code.dat", "w") do io
-#     println(io, "d: res nq all init qse smt")
-#     for d in 3:3
-#         res_d, all, init, qse, smt = check_surface_code_decoder(d)
-#         println("d: res nq all init qse smt")
-#         println("$(d): $(res_d) $(d*d) $(all) $(init) $(qse) $(smt)")
-#         println(io, "$(d): $(res_d) $(d*d) $(all) $(init) $(qse) $(smt)")
-#     end
-# end
+
+open("surface_code.csv", "w") do io
+    println(io, "d,res,nq,all,init,qse,smt")
+    for d in 3:2:29
+        res_d, all, init, qse, smt = check_surface_code_decoder(d)
+        println("d,res,nq,all,init,qse,smt")
+        println("$(d),$(res_d),$(d*d),$(all),$(init),$(qse),$(smt)")
+        println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(qse),$(smt)")
+    end
+end
