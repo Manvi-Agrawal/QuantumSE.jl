@@ -83,7 +83,7 @@ end
 
 
 @qprog surface_code_decoder (d) begin
-    print("Decoder start")
+    # print("Decoder start")
 
     nq = d*d
     lim = (nq-1)÷2
@@ -104,15 +104,21 @@ end
     end
 
     # a strange bug
-    # e = reduce(&, r_z[1:(d-1)÷2])
+    e = reduce(&, r_z[1:(d-1)÷2])
 
-    # sX(1, e)
+    sX(1, e)
 
-    print("Decoder end")
+    # print("Decoder end")
 end
 
-function encode_stabilizer_and_populate_neighbours(stabilizer, d::Integer, X_nbr, Z_nbr)
+function get_stabilizer_and_nbr(d::Integer)
     num_qubits = d*d
+    gen_s = (num_qubits-1)÷2
+
+    stabilizer = fill(false, num_qubits, 2*num_qubits)
+
+    X_nbr = [ [] for _ in 1:gen_s]
+    Z_nbr = [ [] for _ in 1:gen_s]
 
     z_4q = [ 1 + r*d+c+r%2 for r in 0:(d-2) for c in 0:2:(d-2) ]
     # println("Z 4q: $(z_4q)")
@@ -185,6 +191,8 @@ function encode_stabilizer_and_populate_neighbours(stabilizer, d::Integer, X_nbr
         stabilizer[num_qubits, idx] = true
     end
 
+    return (stabilizer, X_nbr, Z_nbr)
+
 end
 
 function get_config(stabilizer, phases, X_nbr, Z_nbr, d::Integer)
@@ -214,9 +222,10 @@ function get_config(stabilizer, phases, X_nbr, Z_nbr, d::Integer)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 
-function encode_phases(phases, d)
+function get_phases(d::Integer)
     num_qubits = d*d
 
+    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
     lx = _bv_const(ctx, "lx")
 
     for i in 1:num_qubits-1
@@ -224,41 +233,27 @@ function encode_phases(phases, d)
     end
 
     phases[num_qubits] = lx
+
+    return phases
 end
 
 function check_surface_code_decoder(d::Integer)
+    @info "Initialization Stage"
+    t0 = time()
+    begin
+        (stabilizer, X_nbr, Z_nbr) = get_stabilizer_and_nbr(d)
+        phases = get_phases(d)
+    end
 
     # println("Encoded stabilizer : $(stabilizer)")
 
     # println("X idxs: $(X_nbr)")
     # print("Z idxs: $(Z_nbr)")
 
-    @info "Initialization Stage"
-    t0 = time()
-    begin
-        num_qubits = d*d
-        gen_s = (num_qubits-1)÷2
-
-	    stabilizer = fill(false, num_qubits, 2*num_qubits)
-
-        X_nbr = [ [] for _ in 1:gen_s]
-        Z_nbr = [ [] for _ in 1:gen_s]
-
-        encode_stabilizer_and_populate_neighbours(stabilizer, d::Integer, X_nbr, Z_nbr)
-
-
-        # encode_stabilizer(stabilizer, d)
-        # populate_neighbours(X_nbr, Z_nbr, d)
-
-	    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
-        encode_phases(phases, d)
-
-        (ρ01, ϕ_x1, cfg1) = get_config(stabilizer, phases, X_nbr, Z_nbr, d)
-    end
-
-    @info "Symbolic Execution Stage"
+    @info "Configuration Init"
     t1 = time()
     begin
+        (ρ01, ϕ_x1, cfg1) = get_config(stabilizer, phases, X_nbr, Z_nbr, d)
         cfgs1 = QuantSymEx(cfg1)
     end
 
@@ -270,7 +265,6 @@ function check_surface_code_decoder(d::Integer)
         for cfg in cfgs1
             if !generate_constraints(
                 cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z2=#, cfg.ϕ[1], cfg.ϕ[2]),
-                # `bitwuzla --smt-comp-mode true -rwl 0 -S kissat`
                 )
                 res = false
                 break
@@ -295,11 +289,12 @@ check_surface_code_decoder(3) # precompile time
 @info "precompile done..."
 
 open("surface_code.csv", "w") do io
-    println(io, "d,res,nq,all,init,qse,smt")
-    for d in 3:2:9
-        res_d, all, init, qse, smt = check_surface_code_decoder(d)
-        println("d,res,nq,all,init,qse,cons_gen, cons_sol")
-        println("$(d),$(res_d),$(d*d),$(all),$(init),$(qse),$(smt)")
-        println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(qse),$(smt)")
+    println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
+
+    for d in 23:2:29
+        res_d, all, init, config, cons_gen, cons_sol = check_surface_code_decoder(d)
+        println("d,res,nq,all,init,config,cons_gen,cons_sol")
+        println("$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_sol),$(cons_gen)")
+        println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_sol),$(cons_gen)")
     end
 end
