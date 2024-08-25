@@ -90,7 +90,7 @@ function check_surface_code_decoder(d::Integer)
 
     d = 3
 
-    @info "Initailization Stage"
+    @info "Initialization Stage"
     t0 = time()
     begin
         num_qubits = d*d
@@ -100,6 +100,9 @@ function check_surface_code_decoder(d::Integer)
         X_idxs = [[2, 3, 5, 6], [4, 5, 7, 8], [1, 2], [8, 9]]
 
         Z_idxs = [[1, 2, 4, 5], [5, 6, 8, 9], [4, 7], [3, 6]]
+
+        println("X idxs: $(X_idxs)")
+        println("Z idxs: $(Z_idxs)")
 
 
         #_xadj(i) = [ x for x in X_idxs if x[1] == i][1] # _xadj(2) = Vector(2, 3, 5, 6)
@@ -205,4 +208,3 @@ end
 d = 3
 res, all, init, qse, smt = check_surface_code_decoder(d)
 println("d: res nq all init qse smt")
-println("$(d): $(res) $(d*d*2) $(all) $(init) $(qse) $(smt)")
