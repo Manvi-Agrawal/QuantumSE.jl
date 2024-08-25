@@ -1,7 +1,35 @@
 using QuantumSE
 using Z3
 
+N4 = 4
+N2 = 2
+
+AD4 = 4
+AD2_H = 2
+AD2_V = 2
+
 ctx = Context()
+
+function _adj4(d, idx)
+    r = (idx-1)÷d
+    c = (idx-1)%d
+
+    return [r*d+c, r*d+c+1, (r+1)*d+c, (r+1)*d+(c+1)] .+ 1
+end
+
+function _adj2_hor(d, idx)
+    r = (idx-1)÷d
+    c = (idx-1)%d
+
+    return [r*d + c, r*d + c+1 ] .+ 1
+end
+
+function _adj2_ver(d, idx)
+    r = (idx-1)÷d
+    c = (idx-1)%d
+
+    return [r*d + c, (r+1)*d + c] .+ 1
+end
 
 function css_check(d, s, s_type, nq, adj)
 
@@ -24,8 +52,6 @@ end
 @qprog surface_code_x_m (idx) begin
     b = _xadj(idx)
 
-    println("SC X_m($(idx))...")
-
     nb = length(b)
     for j in 2:nb
         CNOT(b[1], b[j])
@@ -43,9 +69,6 @@ end
 @qprog surface_code_z_m (idx) begin
     b = _zadj(idx)
 
-    println("SC Z_m($(idx))...")
-
-
     nb = length(b)
     for j in 2:nb
         CNOT(b[j], b[1])
@@ -58,12 +81,15 @@ end
     res
 end
 
+
 @qprog surface_code_decoder (d) begin
+    print("Decoder start")
 
-    nq = d*d 
+    nq = d*d
+    lim = (nq-1)÷2
 
-    s_x = [surface_code_x_m(j) for j in 1:4]
-    s_z = [surface_code_z_m(j) for j in 1:4]
+    s_x = [surface_code_x_m(j) for j in 1:lim]
+    s_z = [surface_code_z_m(j) for j in 1:lim]
 
     r_x = css_check(d, s_x, "X", nq, _xadj)
     r_z = css_check(d, s_z, "Z", nq, _zadj)
@@ -82,6 +108,7 @@ end
 
     sX(1, e)
 
+    print("Decoder end")
 end
 
 
@@ -90,47 +117,102 @@ function check_surface_code_decoder(d::Integer)
 
     d = 3
 
-    @info "Initailization Stage"
+    @info "Initialization Stage"
     t0 = time()
     begin
         num_qubits = d*d
 
 	    stabilizer = fill(false, num_qubits, 2*num_qubits)
 
-        X_idxs = [[2, 3, 5, 6], [4, 5, 7, 8], [1, 2], [8, 9]]
+        z_4q = [ 1 + r*d+c+r%2 for r in 0:(d-2) for c in 0:2:(d-2) ]
+        # println("Z 4q: $(z_4q)")
 
-        Z_idxs = [[1, 2, 4, 5], [5, 6, 8, 9], [4, 7], [3, 6]]
+        x_4q = [ 1 + r*d+c+(r+1)%2 for r in 0:(d-2) for c in 0:2:(d-2) ]
+        # println("X 4q: $(x_4q)")
 
+
+        x_2q_up = [ 1+c for c in 0:2:(d-2) ]
+        x_2q_down = [ 1+ (d-1)*d + c for c in 1:2:(d-2) ]
+        x_2q = vcat(x_2q_up, x_2q_down)
+
+    #    println("X 2q: $(x_2q)")
+
+
+        z_2q_right = [ 1 + r*d+ (d-1) for r in 0:2:(d-2) ]
+        z_2q_left = [ 1 + r*d for r in 1:2:(d-2) ]
+        z_2q = vcat(z_2q_left, z_2q_right)
+
+    #    println("Z 2q: $(z_2q)")
+
+        x_q = vcat(x_4q, x_2q)
+        z_q = vcat(z_4q, z_2q)
+
+
+        X_idxs = [ [] for _ in 1:length(x_q)]
+        Z_idxs = [ [] for _ in 1:length(z_q)]
 
         #_xadj(i) = [ x for x in X_idxs if x[1] == i][1] # _xadj(2) = Vector(2, 3, 5, 6)
         _xadj(j) = X_idxs[j]
         #_zadj(i) = [ z for z in Z_idxs if z[1] == i][1]
         _zadj(j) = Z_idxs[j]
 
-        #xq = [1, 2, 4, 8]
+        r = 0
 
-        for r in 1:4
-            for x_adj in X_idxs[r]#_xadj(xq[r])
-                # println("r=$(r), x_adj=$(x_adj)")
-                stabilizer[r, x_adj] = true
+        for j in eachindex(x_4q)
+            for x_adj in  _adj4( d, x_4q[j])
+                stabilizer[r+j, x_adj] = true
+                push!(X_idxs[j], x_adj)
             end
         end
 
-        #zq = [1, 3, 4, 5]
+        r += length(x_4q)
 
-        for r in 1:4
-            for z_adj in Z_idxs[r]#_zadj(zq[r])
-                stabilizer[4+r, num_qubits+z_adj] = true
+
+        for j in eachindex(x_2q)
+            for x_adj in _adj2_hor( d, x_2q[j])
+                stabilizer[r+j, x_adj] = true
+                # println("Push X_idxs[$(length(x_4q) + j)] <- $(x_adj)")
+
+                push!(X_idxs[length(x_4q) + j], x_adj)
             end
         end
 
-        stabilizer[9,2] = true
-        stabilizer[9,5] = true
-        stabilizer[9,8] = true
+        r += length(x_2q)
 
+        for j in eachindex(z_4q)
+            for z_adj in _adj4( d, z_4q[j])
+                stabilizer[r+j, num_qubits+z_adj] = true
+                push!(Z_idxs[j], z_adj)
+            end
+        end
+
+        r += length(z_4q)
+
+
+        for j in eachindex(z_2q)
+            for z_adj in _adj2_ver( d, z_2q[j])
+                stabilizer[r+j, num_qubits+z_adj] = true
+                push!(Z_idxs[length(z_4q) + j], z_adj)
+            end
+        end
+
+        # r: 1, 2, ..., d ;; c = 1
+        sc_lx = [ 1+ r*d + 1 for r in 0:(d-1) ]
+
+        for idx in sc_lx
+            stabilizer[num_qubits, idx] = true
+        end
         
-        
-        println("Encoded stabilizer : $(stabilizer)")
+        # println("Encoded stabilizer : $(stabilizer)")
+
+        # println("X idxs: $(X_idxs)")
+        # print("Z idxs: $(Z_idxs)")
+
+
+
+        # for t in 1:1
+        #     break
+        # end
 
 
 
@@ -142,7 +224,8 @@ function check_surface_code_decoder(d::Integer)
 	    	phases[i] = _bv_val(ctx, 0)
 	    end
 
-        phases[9] = lx
+        phases[num_qubits] = lx
+
 
         ρ01 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ1 = copy(ρ01)
@@ -156,6 +239,7 @@ function check_surface_code_decoder(d::Integer)
             (:_zadj, _zadj),
             (:ctx, ctx),
             (:css_check, css_check)
+            # (:mwpm, mwpm)
         ])
 
         num_x_errors = (d-1)÷2
@@ -171,7 +255,7 @@ function check_surface_code_decoder(d::Integer)
     @info "Symbolic Execution Stage"
     t1 = time()
     begin
-        cfgs1 = QuantSymEx(cfg1) # ERROR: LoadError: BoundsError: attempt to access 0-element Vector{Vector{Int64}} at index [1]
+        cfgs1 = QuantSymEx(cfg1)
         # cfgs2 = QuantSymEx(cfg2)
     end
 
@@ -183,7 +267,7 @@ function check_surface_code_decoder(d::Integer)
         for cfg in cfgs1
         if !check_state_equivalence(
             # ρ01, ρ01, (ϕ_x1 #=& ϕ_z1=#, cfg1.ϕ[1], cfg1.ϕ[2]),
-            cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z1=#, cfg.ϕ[1], cfg.ϕ[2]),
+            cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z2=#, cfg.ϕ[1], cfg.ϕ[2]),
             `bitwuzla --smt-comp-mode true -rwl 0 -S kissat`
             #`bitwuzla --smt-comp-mode true -S kissat`
             #`bitwuzla --smt-comp-mode true -rwl 0`
@@ -200,9 +284,14 @@ function check_surface_code_decoder(d::Integer)
     res, t2-t0, t1-t0, t2-t1, t3-t2
 end
 
-# check_surface_code_decoder(3) # precompile time
+check_surface_code_decoder(3) # precompile time
 
-d = 3
-res, all, init, qse, smt = check_surface_code_decoder(d)
-println("d: res nq all init qse smt")
-println("$(d): $(res) $(d*d*2) $(all) $(init) $(qse) $(smt)")
+open("surface_code.csv", "w") do io
+    println(io, "d,res,nq,all,init,qse,smt")
+    for d in 3:2:29
+        res_d, all, init, qse, smt = check_surface_code_decoder(d)
+        println("d,res,nq,all,init,qse,smt")
+        println("$(d),$(res_d),$(d*d),$(all),$(init),$(qse),$(smt)")
+        println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(qse),$(smt)")
+    end
+end
