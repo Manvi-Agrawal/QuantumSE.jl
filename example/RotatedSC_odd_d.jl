@@ -115,7 +115,7 @@ end
 
 function check_surface_code_decoder(d::Integer)
 
-    d = 3
+    # d = 3
 
     @info "Initialization Stage"
     t0 = time()
