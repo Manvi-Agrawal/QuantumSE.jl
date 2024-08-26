@@ -221,7 +221,7 @@ function get_stabilizer(R::Integer, C::Integer, X_nbr, Z_nbr)
 
 end
 
-function get_holes(stabilizer, R::Integer, C::Integer, X_nbr, Z_nbr)
+function get_holes(stabilizer, nq::Integer, X_nbr, Z_nbr)
 
     P = GF2.(stabilizer)
     rP = LinearAlgebra.rank(P)
@@ -229,26 +229,38 @@ function get_holes(stabilizer, R::Integer, C::Integer, X_nbr, Z_nbr)
     Q = rref(P)
     rQ = LinearAlgebra.rank(Q)
 
-    nq = R*C
+    # nq = R*C
 
-    for hole in 1:nq
-        a_temp = stabilizer[1:nq-1, :]
+    for hole in 23:23
+        a_temp = stabilizer
         a_new = delete_matrix_cols(a_temp, [hole, nq+hole]) 
         
+        A = GF2.(a_temp)
+        rA = LinearAlgebra.rank(A)
+
+        # println("\nA=$(A)")
+
+        B = rref(A)
+        rB = LinearAlgebra.rank(B)
+
+        println("Col deletion:: hole = $(hole), Ranks-AB: $(rA), $(rB)")
+
+
+        k_temp = stabilizer[1:nq-1, :]
+        k_new = delete_matrix_cols(k_temp, [hole, nq+hole]) 
         
+        K = GF2.(k_new)
+        rK = LinearAlgebra.rank(K)
 
-
-        C = GF2.(a_new)
-        rC = LinearAlgebra.rank(C)
-
-        D = rref(C)
+        L = rref(K)
         
-        rD = LinearAlgebra.rank(D)
-        println("hole = $(hole), Ranks-CD: $(rC), $(rD)")
+        rL = LinearAlgebra.rank(L)
+        println("LX + Col deletion:: , hole = $(hole), Ranks-KL: $(rK), $(rL)")
 
 
-        if rD<rQ
-            println("YAY: hole = $(hole), Ranks-QD: $(rQ), $(rD)")
+
+        if rL<rQ
+            println("YAY: hole = $(hole), Ranks-QD: $(rQ), $(rL)")
         end
 
         # l_op = stabilizer[nq, :]
@@ -257,65 +269,72 @@ function get_holes(stabilizer, R::Integer, C::Integer, X_nbr, Z_nbr)
 
         # temp = s_holes
         # a_new = vcat(a_new, temp)
+
+        return k_new
     end
 
 end
 
-function check_surface_code_decoder(R::Integer, C::Integer)
-    @info "Initialization Stage"
-    res = true
+R = 9 
+C = 5
 
-    println("d,q_h,res,nq,all,init,config,cons_gen,cons_sol")
+@info "Initialization Stage"
+res = true
 
-    ts = time()
+println("d,q_h,res,nq,all,init,config,cons_gen,cons_sol")
 
-    begin
-        num_qubits = R*C
-        (X_nbr, Z_nbr) = get_nbr(R, C)
-        # q_h = (R÷2)*C + C
+ts = time()
 
-        # println("q_h=$(q_h)")
+begin
+    num_qubits = R*C
+    (X_nbr, Z_nbr) = get_nbr(R, C)
+    # q_h = (R÷2)*C + C
 
-        println("X_nbr: $(X_nbr)")
-        println("Z_nbr: $(Z_nbr)")
+    # println("q_h=$(q_h)")
 
-
-        stabilizer = get_stabilizer(R, C, X_nbr, Z_nbr)
-        # println("Encoded stabilizer : $(stabilizer)")
-
-        P = GF2.(stabilizer)
-        rP = LinearAlgebra.rank(P)
-
-        # println("\nA=$(A)")
-
-        Q = rref(P)
-        rQ = LinearAlgebra.rank(Q)
-
-        println("rPQ: $(rP), $(rQ)")
-
-        s_temp = stabilizer[1:num_qubits-1, :]
-
-        A = GF2.(s_temp)
-        rA = LinearAlgebra.rank(A)
-
-        # println("\nA=$(A)")
-
-        B = rref(A)
-        rB = LinearAlgebra.rank(B)
-
-        println("rAB: $(rP), $(rQ)")
-
-        get_holes(stabilizer, R, C, X_nbr, Z_nbr)
-    end
+    println("X_nbr: $(X_nbr)")
+    println("Z_nbr: $(Z_nbr)")
 
 
-    te = time()
+    stabilizer = get_stabilizer(R, C, X_nbr, Z_nbr)
+    # println("Encoded stabilizer : $(stabilizer)")
 
-    println("Total time: $(te-ts)")
+    P = GF2.(stabilizer)
+    rP = LinearAlgebra.rank(P)
 
-    # res, t4-t0, t1-t0, t2-t1, t3-t2, t4-t3
-    res, te-ts
+    # println("\nA=$(A)")
+
+    Q = rref(P)
+    rQ = LinearAlgebra.rank(Q)
+
+    println("Original:: rPQ: $(rP), $(rQ)")
+
+    s_temp = stabilizer[1:num_qubits-1, :]
+
+    A = GF2.(s_temp)
+    rA = LinearAlgebra.rank(A)
+
+    # println("\nA=$(A)")
+
+    B = rref(A)
+    rB = LinearAlgebra.rank(B)
+
+    println("LX deletion :: rAB: $(rA), $(rB)")
+
+    new_stabilizer = get_holes(stabilizer, num_qubits, X_nbr, Z_nbr)
+
+    X_nbr_new = sanitise_nbr(X_nbr)
+    Y_nbr_new = sanitise_nbr(Y_nbr) 
+
 end
+
+
+te = time()
+
+println("Total time: $(te-ts)")
+
+# res, t4-t0, t1-t0, t2-t1, t3-t2, t4-t3
+res, te-ts
 
 
 
