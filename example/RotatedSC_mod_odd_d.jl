@@ -304,7 +304,7 @@ open("surface_code.csv", "w") do io
     for d in 3:3
         res_d, all, init, config, cons_gen, cons_sol = check_surface_code_decoder(d)
         println("d,res,nq,all,init,config,cons_gen,cons_sol")
-        println("$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_sol),$(cons_gen)")
-        println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_sol),$(cons_gen)")
+        println("$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
+        println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
     end
 end
