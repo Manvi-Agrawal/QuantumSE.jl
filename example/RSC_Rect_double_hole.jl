@@ -155,12 +155,12 @@ end
 end
 
 
-@qprog surface_code_decoder (R, C) begin
+@qprog surface_code_decoder (R, C, X_nbr, Z_nbr) begin
     # print("Decoder start")
 
-    nq = R*C
-    x_gen_s = ((R-1)*(C-1))÷2 + (C-1)
-    z_gen_s = ((R-1)*(C-1))÷2 + (R-1)
+    nq = R*C - 2
+    x_gen_s = length(X_nbr)
+    z_gen_s = length(Z_nbr)
 
     s_x = [surface_code_x_m(j) for j in 1:x_gen_s]
     s_z = [surface_code_z_m(j) for j in 1:z_gen_s]
@@ -298,7 +298,7 @@ function get_config(stabilizer, phases, X_nbr, Z_nbr, R::Integer, C::Integer)
     x_errors = inject_errors(ρ1, "X")
     ϕ_x1 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
   
-    decoder = surface_code_decoder(R, C)
+    decoder = surface_code_decoder(R, C, X_nbr, Z_nbr)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 
