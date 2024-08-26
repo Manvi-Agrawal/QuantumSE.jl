@@ -1,0 +1,503 @@
+
+julia> include("example/RSC_Rect_single_hole.jl")
+[ Info: precompile done...
+[ Info: Initialization Stage
+d,q_h,res,nq,all,init,config,cons_gen,cons_sol
+q_h=1
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 1, false, 45, 0.40006494522094727, 0.005952119827270508, 0.3927018642425537, 0.0014109611511230469, 0.0
+q_h=2
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 2, false, 45, 0.16245007514953613, 0.00011706352233886719, 0.1609480381011963, 0.0013849735260009766, 0.0
+q_h=3
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 3, false, 45, 0.1596851348876953, 0.00010800361633300781, 0.15813207626342773, 0.0014450550079345703, 0.0
+q_h=4
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 4, false, 45, 0.14090919494628906, 0.00010204315185546875, 0.1393601894378662, 0.0014469623565673828, 0.0
+q_h=5
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 5, false, 45, 0.14438509941101074, 0.00013709068298339844, 0.14313602447509766, 0.0011119842529296875, 0.0
+q_h=6
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 6, false, 45, 0.16219615936279297, 9.799003601074219e-5, 0.16052603721618652, 0.0015721321105957031, 0.0
+q_h=7
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 7, false, 45, 0.16614890098571777, 0.0001049041748046875, 0.16477704048156738, 0.0012669563293457031, 0.0
+q_h=8
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 8, false, 45, 0.1437380313873291, 8.511543273925781e-5, 0.14236903190612793, 0.001283884048461914, 0.0
+q_h=9
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 9, false, 45, 0.13991808891296387, 7.295608520507812e-5, 0.13864493370056152, 0.0012001991271972656, 0.0
+q_h=10
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 10, false, 45, 0.1410079002380371, 9.012222290039062e-5, 0.13971877098083496, 0.0011990070343017578, 0.0
+q_h=11
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 11, false, 45, 0.1443939208984375, 9.012222290039062e-5, 0.14294791221618652, 0.001355886459350586, 0.0
+q_h=12
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 12, false, 45, 0.15238189697265625, 9.107589721679688e-5, 0.15103793144226074, 0.001252889633178711, 0.0
+q_h=13
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 13, false, 45, 0.14091801643371582, 8.893013000488281e-5, 0.13954401016235352, 0.0012850761413574219, 0.0
+q_h=14
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 14, false, 45, 0.13951921463012695, 0.000102996826171875, 0.1381380558013916, 0.0012769699096679688, 1.1920928955078125e-6
+q_h=15
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 15, false, 45, 0.1490769386291504, 8.893013000488281e-5, 0.14753508567810059, 0.0014529228210449219, 0.0
+q_h=16
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 16, false, 45, 0.15718603134155273, 0.00010704994201660156, 0.1548018455505371, 0.0022771358489990234, 0.0
+q_h=17
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 17, false, 45, 0.17029285430908203, 0.0001289844512939453, 0.16860604286193848, 0.0015578269958496094, 0.0
+q_h=18
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 18, false, 45, 0.15611505508422852, 0.00011515617370605469, 0.15446782112121582, 0.0015320777893066406, 0.0
+q_h=19
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 19, false, 45, 0.14877700805664062, 0.00015997886657714844, 0.1473851203918457, 0.0012319087982177734, 0.0
+q_h=20
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 20, false, 45, 0.14668512344360352, 0.0001239776611328125, 0.1452481746673584, 0.0013129711151123047, 0.0
+q_h=21
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 21, false, 45, 0.17739605903625488, 0.00010800361633300781, 0.1760702133178711, 0.0012178421020507812, 0.0
+q_h=22
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 22, false, 45, 0.13993310928344727, 0.000102996826171875, 0.13857793807983398, 0.0012521743774414062, 0.0
+q_h=23
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 23, false, 45, 0.14246010780334473, 9.393692016601562e-5, 0.1410360336303711, 0.0013301372528076172, 0.0
+q_h=24
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 24, false, 45, 0.14657211303710938, 9.894371032714844e-5, 0.14490699768066406, 0.001566171646118164, 0.0
+q_h=25
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 25, false, 45, 0.14775896072387695, 0.00012803077697753906, 0.14625978469848633, 0.001371145248413086, 0.0
+q_h=26
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 26, false, 45, 0.16888213157653809, 0.00014519691467285156, 0.16738080978393555, 0.0013561248779296875, 0.0
+q_h=27
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 27, false, 45, 0.1482222080230713, 0.00010013580322265625, 0.14687395095825195, 0.0012481212615966797, 0.0
+q_h=28
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 28, false, 45, 0.14238309860229492, 0.00010514259338378906, 0.1409437656402588, 0.0013341903686523438, 0.0
+q_h=29
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 29, false, 45, 0.13868999481201172, 9.202957153320312e-5, 0.1374509334564209, 0.0011470317840576172, 0.0
+q_h=30
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 30, false, 45, 0.14176487922668457, 8.678436279296875e-5, 0.1405630111694336, 0.0011150836944580078, 0.0
+q_h=31
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 31, false, 45, 0.15428400039672852, 6.794929504394531e-5, 0.15295886993408203, 0.001257181167602539, 0.0
+q_h=32
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 32, false, 45, 0.13863801956176758, 8.797645568847656e-5, 0.1373300552368164, 0.0012199878692626953, 0.0
+q_h=33
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 33, false, 45, 0.14301681518554688, 7.081031799316406e-5, 0.14176607131958008, 0.0011799335479736328, 0.0
+q_h=34
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 34, false, 45, 0.14358305931091309, 8.893013000488281e-5, 0.14201593399047852, 0.0014781951904296875, 0.0
+q_h=35
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 35, false, 45, 0.1555919647216797, 0.00010395050048828125, 0.1540510654449463, 0.0014369487762451172, 0.0
+q_h=36
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 36, false, 45, 0.1699380874633789, 0.00011610984802246094, 0.1685810089111328, 0.0012409687042236328, 0.0
+q_h=37
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 37, false, 45, 0.1391770839691162, 7.200241088867188e-5, 0.13795804977416992, 0.0011470317840576172, 0.0
+q_h=38
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 38, false, 45, 0.1391599178314209, 6.985664367675781e-5, 0.13786101341247559, 0.0012290477752685547, 0.0
+q_h=39
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 39, false, 45, 0.144866943359375, 8.916854858398438e-5, 0.14317584037780762, 0.0016019344329833984, 0.0
+q_h=40
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 40, false, 45, 0.1585829257965088, 0.00013399124145507812, 0.15719008445739746, 0.00125885009765625, 0.0
+q_h=41
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 41, false, 45, 0.1457819938659668, 9.298324584960938e-5, 0.14430809020996094, 0.00138092041015625, 0.0
+q_h=42
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 42, false, 45, 0.14780497550964355, 9.202957153320312e-5, 0.14627790451049805, 0.0014350414276123047, 0.0
+q_h=43
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 43, false, 45, 0.14902114868164062, 9.417533874511719e-5, 0.1476888656616211, 0.001238107681274414, 0.0
+q_h=44
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 44, false, 45, 0.13857507705688477, 9.512901306152344e-5, 0.13736295700073242, 0.0011169910430908203, 0.0
+q_h=45
+[ Info: Configuration Init
+Expected Len(phases) = 90,; Got 90
+[ Info: SMT constraint Generation
+[ Info: CONSTRAINT GEN
+┌ Error: The Stabilizer does not match, the program is wrong even without error insertion
+└ @ QuantumSE /home/manvi-agrawal/QuantumSE.jl/src/SymbolicStabilizer.jl:521
+The Stabilizer does not match, the program is wrong even without error insertion
+res after constraint Gen: false
+[ Info: SMT Solver Stage
+5, 45, false, 45, 0.15288805961608887, 0.00010514259338378906, 0.15170693397521973, 0.0010759830474853516, 0.0
+Total time: 6.981595993041992
+d,res,nq,all,init,config,cons_gen,cons_sol
+5,false,25,6.981595993041992,6.981595993041992,6.981595993041992,6.981595993041992,6.981595993041992

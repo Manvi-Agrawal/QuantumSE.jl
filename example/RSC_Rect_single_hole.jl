@@ -321,63 +321,89 @@ function check_surface_code_decoder(R::Integer, C::Integer)
     @info "Initialization Stage"
     res = true
 
-    t0 = time()
-    begin
-        (X_nbr, Z_nbr) = get_nbr(R, C)
-        q_h = (R÷2)*C + C
+    println("d,q_h,res,nq,all,init,config,cons_gen,cons_sol")
 
-        println("q_h=$(q_h)")
+    ts = time()
 
-        X_nbr = sanitise_nbr(X_nbr, [q_h])
-        Z_nbr = sanitise_nbr(Z_nbr, [q_h])
+    # open("rsc_rect_run.txt", "w") do io
 
-        println("X_nbr: $(X_nbr)")
-        println("Z_nbr: $(Z_nbr)")
+    for q_h in 1:R*C
+
+        t0 = time()
 
 
-        stabilizer = get_stabilizer(R, C, X_nbr, Z_nbr, [q_h])
+        begin
+            (X_nbr, Z_nbr) = get_nbr(R, C)
+            # q_h = (R÷2)*C + C
 
-        phases = get_phases(R, C)
-    end
+            println("q_h=$(q_h)")
 
-    # println("Encoded stabilizer : $(stabilizer)")
+            X_nbr = sanitise_nbr(X_nbr, [q_h])
+            Z_nbr = sanitise_nbr(Z_nbr, [q_h])
 
-    @info "Configuration Init"
-    t1 = time()
-    begin
-        (ρ01, ϕ_x1, cfg1) = get_config(stabilizer, phases, X_nbr, Z_nbr, R, C)
-        cfgs1 = QuantSymEx(cfg1)
-    end
+            # println("X_nbr: $(X_nbr)")
+            # println("Z_nbr: $(Z_nbr)")
 
-    @info "SMT constraint Generation"
-    t2 = time()
 
-    begin
-        for cfg in cfgs1
-            if !generate_constraints(
-                cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z2=#, cfg.ϕ[1], cfg.ϕ[2]),
-                )
-                res = false
-                break
+            stabilizer = get_stabilizer(R, C, X_nbr, Z_nbr, [q_h])
+
+            phases = get_phases(R, C)
+        end
+
+        # println("Encoded stabilizer : $(stabilizer)")
+
+        @info "Configuration Init"
+        t1 = time()
+        begin
+            (ρ01, ϕ_x1, cfg1) = get_config(stabilizer, phases, X_nbr, Z_nbr, R, C)
+            cfgs1 = QuantSymEx(cfg1)
+        end
+
+        @info "SMT constraint Generation"
+        t2 = time()
+
+        begin
+            for cfg in cfgs1
+                if !generate_constraints(
+                    cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z2=#, cfg.ϕ[1], cfg.ϕ[2]),
+                    )
+                    res = false
+                    break
+                end
+            end
+
+        end
+
+        println("res after constraint Gen: $(res)")
+
+        @info "SMT Solver Stage"
+        t3 = time()
+
+        begin
+            if res
+                res = solve_constraints(`bitwuzla --smt-comp-mode true -rwl 0 -S kissat`)
             end
         end
 
-    end
+        t4 = time()
 
-    println("res after constraint Gen: $(res)")
+        d = min(R, C)
 
-    @info "SMT Solver Stage"
-    t3 = time()
+        println("$(d), $(q_h), $(res), $(R*C), $(t4-t0), $(t1-t0), $(t2-t1), $(t3-t2), $(t4-t3)")
 
-    begin
+        # Exit q_h loop
         if res
-            res = solve_constraints(`bitwuzla --smt-comp-mode true -rwl 0 -S kissat`)
+            println("YAY q_h=$(q_h)")
+            break
         end
     end
 
-    t4 = time()
+    te = time()
 
-    res, t4-t0, t1-t0, t2-t1, t3-t2, t4-t3
+    println("Total time: $(te-ts)")
+
+    # res, t4-t0, t1-t0, t2-t1, t3-t2, t4-t3
+    res, te-ts, te-ts, te-ts, te-ts, te-ts
 end
 
 # check_surface_code_decoder(3) # precompile time
