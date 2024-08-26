@@ -504,6 +504,100 @@ end
     e
 end
 
+function generate_constraints(q1::SymStabilizerState, q2::SymStabilizerState, assumptions::Tuple{Z3.ExprAllocated, Z3.ExprAllocated, Z3.ExprAllocated}, slv_backend_cmd::Cmd=`bitwuzla -e 0 -SE kissat`;use_z3=false)
+    if q1.num_qubits != q2.num_qubits
+        @error "The number of qubits does not match"
+        return false
+    end
+    
+    ranges = q1.num_qubits+1:2*q1.num_qubits
+
+    _canonicalize_gott!(q1)
+    _canonicalize_gott!(q2)
+
+    if ~_equal(q1.xzs, q2.xzs, ranges)
+        @error "The Stabilizer does not match, the program is wrong even without error insertion"
+        return false
+    end
+
+    slv = Solver(q1.ctx)
+
+    add(slv, assumptions[1])
+    add(slv, not(assumptions[2]))
+
+    smt2_file_name = "_temp_check_preconditons_"
+
+    open(smt2_file_name*".smt2", "w") do io
+        println(io, "(set-logic QF_BV)")
+        println(io, "(set-option :produce-models true)")
+        println(io, slv)
+        println(io, "(check-sat)")
+        println(io, "(get-model)")
+        println(io, "(exit)")
+    end
+    
+
+    Z3.reset(slv)
+
+    # println("Slv after pre-cond reset: $(slv)")
+
+    conjecture = reduce(&, [simplify(q1.phases[j] ⊻ q2.phases[j]) == _bv_val(q1.ctx, 0) for j in ranges])
+    
+    # println("Conjecture by reduce: $(conjecture)")
+    conjecture = assumptions[1] & assumptions[3] & not(conjecture)
+
+    # println("A1: $(assumptions[1])")
+    add(slv, conjecture)
+    # println("A3: $(assumptions[3])")
+
+
+    smt2_file_name = "_temp_check_equivalence_"
+
+    open(smt2_file_name*".smt2", "w") do io
+        println(io, "(set-logic QF_BV)")
+        println(io, "(set-option :produce-models true)")
+        println(io, slv)
+        println(io, "(check-sat)")
+        println(io, "(get-model)")
+        println(io, "(exit)")
+    end
+
+    return true
+
+end
+
+function solve_constraints(slv_backend_cmd::Cmd=`bitwuzla -e 0 -SE kissat`)
+    smt2_file_name = "_temp_check_preconditons_"
+
+    res_string = read(pipeline(`$(slv_backend_cmd) $(smt2_file_name*".smt2")`), String)
+
+    if ~occursin("unsat", res_string)
+        @error "The preconditions of external programs are not satisfied"
+        open(smt2_file_name*".output", "w") do io
+            println(io, res_string)
+        end
+        @error "Bug report for preconditions not matching has been written to ./$(smt2_file_name).output"
+        return false
+    end
+
+
+    smt2_file_name = "_temp_check_equivalence_"
+
+    res_string = read(pipeline(`$(slv_backend_cmd) $(smt2_file_name*".smt2")`), String)
+
+    if ~occursin("unsat", res_string)
+        @error "There exist some allowed errors that the program cannot correct"
+        open(smt2_file_name*".output", "w") do io
+            println(io, res_string)
+        end
+        @error "Bug report for allowed errors that the program cannot correct has been written to ./$(smt2_file_name).output"
+        return false
+    end
+
+    return true
+end
+
+
 function check_state_equivalence(q1::SymStabilizerState, q2::SymStabilizerState, assumptions::Tuple{Z3.ExprAllocated, Z3.ExprAllocated, Z3.ExprAllocated}, slv_backend_cmd::Cmd=`bitwuzla -e 0 -SE kissat`;use_z3=false)
     if q1.num_qubits != q2.num_qubits
         @info "The number of qubits does not match"
@@ -557,16 +651,16 @@ function check_state_equivalence(q1::SymStabilizerState, q2::SymStabilizerState,
 
     Z3.reset(slv)
 
-    println("Slv after pre-cond reset: $(slv)")
+    # println("Slv after pre-cond reset: $(slv)")
 
     conjecture = reduce(&, [simplify(q1.phases[j] ⊻ q2.phases[j]) == _bv_val(q1.ctx, 0) for j in ranges])
     
-    println("Conjecture by reduce: $(conjecture)")
+    # println("Conjecture by reduce: $(conjecture)")
     conjecture = assumptions[1] & assumptions[3] & not(conjecture)
 
-    println("A1: $(assumptions[1])")
+    # println("A1: $(assumptions[1])")
     add(slv, conjecture)
-    println("A3: $(assumptions[3])")
+    # println("A3: $(assumptions[3])")
 
     if use_z3
         res = check(slv)
