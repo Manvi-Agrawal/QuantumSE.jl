@@ -71,7 +71,9 @@ function TannerCode(G::Vector{<:AbstractGroup}, A::Vector{<:AbstractGroup}, B::V
     HXt, HZt
 end
 
-function css_check(d, s, s_type, nq, adj)
+function css_check(d, syndromes, s_type, nq, adj)
+
+    s = syndromes
 
     ## pre-condition
     ϕ₁ = bool_val(ctx, true)
@@ -79,10 +81,13 @@ function css_check(d, s, s_type, nq, adj)
     ## post-condition
     ϕ₂ = bool_val(ctx, true)
     r = [_bv_const(ctx, "r_$(s_type)_$(j)") for j in 1:nq]
+
+    # XOR(syndrome, recovery) = 0
     for j in 1:length(s)
         ϕ₂ = ϕ₂ & (s[j] ⊻ reduce(⊻,  r[adj(j)]) == _bv_val(ctx, 0))
     end
 
+    # Sum of recoveries
     ϕ₃ = (sum( (x -> concat(bv_val(ctx, 0, _len2(nq)), x)).(r) ) <= bv_val(ctx, (d-1)÷2, _len2(nq)+1))
 
     (r, ϕ₁, ϕ₂ & ϕ₃)

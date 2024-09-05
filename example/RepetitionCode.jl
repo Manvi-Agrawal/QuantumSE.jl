@@ -25,7 +25,8 @@ function mwpm(n::Integer, s)
     println("post-condition 2: $(ϕ₂)")
     println("post-condition 3: $(ϕ₃)")
 
-    (r, ϕ₁, ϕ₂ & ϕ₃)
+    println("MANVI")
+    (r)
 end
 
 function repetition_s(n, idx)
@@ -58,6 +59,7 @@ end
 @qprog repetition_m_zz (n, idx) begin
     CNOT(idx, idx%n+1)
     res = M(idx%n+1)
+    println("Res: $(res)")
     CNOT(idx, idx%n+1)
     
     res
@@ -116,15 +118,15 @@ function check_repetition_decoder(n)
         ρ₀ = from_stabilizer(num_qubits, stabilizer, phases, ctx)
         ρ = copy(ρ₀)
 
-        println("ρ after stabilizer : $(ρ)")
+        # println("ρ after stabilizer : $(ρ)")
 
-        println("Tableau after encoded stabilizer init:")
-        print_full_tableau(ρ)
-        println("---------------------------------------------------")
+        # println("Tableau after encoded stabilizer init:")
+        # print_full_tableau(ρ)
+        # println("---------------------------------------------------")
 
 
-        # num_x_errors = (n-1)÷2
-        num_x_errors = 0
+        num_x_errors = (n-1)÷2
+        # num_x_errors = 0
 
         println("NUM X errors : $(num_x_errors)")
 
@@ -137,9 +139,9 @@ function check_repetition_decoder(n)
 
         cfg0 = SymConfig(repetition_decoder(n), σ, ρ)
 
-        println("Tableau after symconfig init:")
-        print_full_tableau(cfg0.ρ)
-        println("---------------------------------------------------")
+        # println("Tableau after symconfig init:")
+        # print_full_tableau(cfg0.ρ)
+        # println("---------------------------------------------------")
     end
 
     @info "Symbolic Execution Stage"
@@ -151,9 +153,9 @@ function check_repetition_decoder(n)
     @time begin
         res = true
         for cfg in cfgs
-            println("Tableau in config:")
-            print_full_tableau(cfg.ρ)
-            println("---------------------------------------------------")
+            # println("Tableau in config:")
+            # print_full_tableau(cfg.ρ)
+            # println("---------------------------------------------------")
 
             if !check_state_equivalence(
                 cfg.ρ, ρ₀, (ϕ_x #=& ϕ_z=#, cfg.ϕ[1], cfg.ϕ[2]),

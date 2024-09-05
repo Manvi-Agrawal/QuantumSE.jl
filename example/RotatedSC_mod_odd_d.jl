@@ -53,12 +53,15 @@ end
     b = _xadj(idx)
 
     nb = length(b)
+
     for j in 2:nb
         CNOT(b[1], b[j])
     end
+
     H(b[1])
     res = M(b[1])
     H(b[1])
+    
     for j in nb:-1:2
         CNOT(b[1], b[j])
     end
@@ -104,9 +107,9 @@ end
     end
 
     # a strange bug
-    e = reduce(&, r_z[1:(d-1)÷2])
+    # e = reduce(&, r_z[1:(d-1)÷2])
 
-    sX(1, e)
+    # sX(1, e)
 
     # print("Decoder end")
 end
@@ -245,7 +248,7 @@ function get_phases(d::Integer)
 end
 
 function check_surface_code_decoder(d::Integer)
-    @info "Initialization Stage"
+    @info "Initialization Stage: Encode State"
     t0 = time()
     begin
         ( X_nbr, Z_nbr) = get_nbr(d)
@@ -260,14 +263,14 @@ function check_surface_code_decoder(d::Integer)
 
     # println("Encoded stabilizer : $(stabilizer)")
 
-    @info "Configuration Init"
+    @info "Decoder Configuration"
     t1 = time()
     begin
         (ρ01, ϕ_x1, cfg1) = get_config(stabilizer, phases, X_nbr, Z_nbr, d)
         cfgs1 = QuantSymEx(cfg1)
     end
 
-    @info "SMT constraint Generation"
+    @info "Constraint Generation"
     t2 = time()
 
     begin
@@ -283,7 +286,7 @@ function check_surface_code_decoder(d::Integer)
 
     end
 
-    @info "SMT Solver Stage"
+    @info "Constraint Solver"
     t3 = time()
 
     begin
@@ -301,7 +304,7 @@ check_surface_code_decoder(3) # precompile time
 open("surface_code.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
-    for d in 3:3
+    for d in 3:2:11
         res_d, all, init, config, cons_gen, cons_sol = check_surface_code_decoder(d)
         println("d,res,nq,all,init,config,cons_gen,cons_sol")
         println("$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
