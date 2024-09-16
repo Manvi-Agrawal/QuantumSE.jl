@@ -193,14 +193,6 @@ end
 
 end
 
-# function toric_decoder(d, ctx, _xadj, _zadj)
-#     nq = 2*d*d
-#     xlim = (nq-1)÷2
-#     zlim = (nq-1)÷2
-
-#     decoder = QEC_Helper.qec_decoder(ctx, d, nq, xlim, zlim, _xadj, _zadj, bug)
-# end
-
 
 open("toric_code.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
