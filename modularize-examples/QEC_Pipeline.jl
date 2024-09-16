@@ -70,12 +70,12 @@ end
 
 Base.@kwdef mutable struct QecDecoderConfig
     d::Integer
-    num_qubits::Integer = d*d
+    num_qubits::Integer
+    stabilizer
+    phases
+    ctx
     _xadj = missing
     _zadj = missing
-    stabilizer = missing
-    phases = missing
-    ctx = missing
     decoder = missing
     decoder_params = missing
     x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit

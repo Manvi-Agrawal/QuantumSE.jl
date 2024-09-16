@@ -166,6 +166,7 @@ open("rsc.csv", "w") do io
         
         rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
             d=d,
+            num_qubits = d*d,
             _xadj=_xadj,
             _zadj=_zadj,
             stabilizer=stabilizer,
