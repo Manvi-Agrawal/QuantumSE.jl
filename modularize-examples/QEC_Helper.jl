@@ -2,8 +2,7 @@ module QEC_Helper
 
 using QuantumSE
 
-function get_stabilizer(d::Integer, X_nbr, Z_nbr)
-    num_qubits = d*d
+function get_stabilizer_from_nbr(num_qubits::Integer, X_nbr, Z_nbr, l_op)
 
     stabilizer = fill(false, num_qubits, 2*num_qubits)
 
@@ -23,11 +22,14 @@ function get_stabilizer(d::Integer, X_nbr, Z_nbr)
         end
     end 
 
-    # r: 1, 2, ..., d ;; c = 1
-    sc_lx = [ 1+ r*d + 1 for r in 0:(d-1) ]
-
-    for idx in sc_lx
-        stabilizer[num_qubits, idx] = true
+    for row in 1:length(l_op)
+        s_row = row + length(X_nbr) + length(Z_nbr)
+        (l_op_row, s_type) = l_op[row]
+        
+        for idx in l_op_row
+            s_col = s_type == "X" ? idx : num_qubits+idx
+            stabilizer[num_qubits, s_col] = true
+        end
     end
 
     return stabilizer

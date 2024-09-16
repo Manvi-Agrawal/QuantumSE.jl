@@ -102,6 +102,14 @@ function get_nbr(d::Integer)
 end
 
 
+function rsc_l_op(d::Integer)
+    # r: 1, 2, ..., d ;; c = 1
+    sc_lx = [ 1+ r*d + 1 for r in 0:(d-1) ]
+
+    return [(sc_lx, "X")]
+
+end
+
 
 function get_phases(d::Integer)
     num_qubits = d*d
@@ -146,13 +154,13 @@ end
 open("rsc.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
-    for d in 3:2:7
+    for d in 3:2:3
         tm2 = time()
         nq = d*d
         
         (X_nbr, Z_nbr) = get_nbr(d)
 
-        stabilizer = QEC_Helper.get_stabilizer(d, X_nbr, Z_nbr)
+        stabilizer = QEC_Helper.get_stabilizer_from_nbr(nq, X_nbr, Z_nbr, rsc_l_op(d))
 
         _xadj(j) = X_nbr[j]
         _zadj(j) = Z_nbr[j]
@@ -181,8 +189,12 @@ open("rsc.csv", "w") do io
         tm1 = time()
         
 
-        # println("X_nbr: $(X_nbr)")
-        # println("Z_nbr: $(Z_nbr)")
+        println("X_nbr: $(X_nbr)")
+        println("Z_nbr: $(Z_nbr)")
+        println("rsc_l_op: $(rsc_l_op(d))")
+
+        
+        println("Encoded stabilizer: $(stabilizer)")
 
         # println("Phases: $(phases)")
 
