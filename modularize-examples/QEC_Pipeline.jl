@@ -90,7 +90,7 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
     begin
         d = decoder_config.d
         stabilizer = decoder_config.stabilizer
-        # (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
+        (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
     end
 
 
@@ -104,7 +104,6 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
     t1 = time()
     if res
         @info "Symbolic Execution"
-        (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
         cfgs1 = res ? QuantSymEx(cfg1) : cfg1
     end
 
