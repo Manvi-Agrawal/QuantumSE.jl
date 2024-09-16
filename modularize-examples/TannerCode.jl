@@ -135,7 +135,7 @@ open("tanner.csv", "w") do io
         (_xadj, _zadj) = get_adj(HXt, HZt, nx, nz)
 
 
-        tanner_decoder = QEC_Helper.qec_decoder
+        tanner_decoder = QEC_Defaults.qec_decoder
         tanner_bug = QEC_Defaults.bug
 
         d = 6 # min(dx, dz)

@@ -157,7 +157,7 @@ open("rsc.csv", "w") do io
         _xadj(j) = X_nbr[j]
         _zadj(j) = Z_nbr[j]
 
-        rsc_decoder = QEC_Helper.qec_decoder
+        rsc_decoder = QEC_Defaults.qec_decoder
         nx = (nq-1)÷2
         nz = (nq-1)÷2
         rsc_bug = QEC_Defaults.bug

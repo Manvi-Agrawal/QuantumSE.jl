@@ -34,27 +34,7 @@ function get_stabilizer(d::Integer, X_nbr, Z_nbr)
 
 end
 
-@qprog qec_decoder (nx, nz, nq, d, ctx) begin
-    # println("Decoder start")
 
-    s_x = [x_syndrome_circuit(j) for j in 1:nx]
-    s_z = [z_syndrome_circuit(j) for j in 1:nz]
-
-    r_x = decoder_algo_xz(ctx, d, s_x, "X", nq, _xadj)
-    r_z = decoder_algo_xz(ctx, d, s_z, "Z", nq, _zadj)
-
-    for j in 1:nq
-        sZ(j, r_x[j])
-        sX(j, r_z[j])
-    end
-
-    # a strange bug
-    # bug(ρ, r_x, r_z, d)
-    e = reduce(&, r_z[1:((d-1)÷2)])
-    sX(1, e)
-
-    # println("Decoder end")
-end
 
 
 # export get_stabilizer
