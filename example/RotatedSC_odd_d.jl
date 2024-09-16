@@ -211,6 +211,10 @@ function get_config(stabilizer, phases, X_nbr, Z_nbr, d::Integer)
     _xadj(j) = X_nbr[j]
     _zadj(j) = Z_nbr[j]
 
+    println("Type(stabilizer): $(typeof(stabilizer))")
+    println("Type(phases): $(typeof(phases))")
+
+
     ρ01 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
     ρ1 = copy(ρ01)
 

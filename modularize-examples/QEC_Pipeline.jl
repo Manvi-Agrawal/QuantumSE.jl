@@ -24,8 +24,8 @@ ctx = Context()
 function get_sym_config(stabilizer, decoder_config)
     d = decoder_config.d
     phases = decoder_config.phases
-    X_nbr = decoder_config.X_nbr
-    Z_nbr = decoder_config.Z_nbr
+    _xadj = decoder_config._xadj
+    _zadj = decoder_config._zadj
     ctx = decoder_config.ctx
     x_syndrome_circuit = decoder_config.x_syndrome_circuit
     z_syndrome_circuit = decoder_config.z_syndrome_circuit
@@ -34,10 +34,9 @@ function get_sym_config(stabilizer, decoder_config)
 
 
     # println("LOG-INFO: Inside get_sym_config")
-    num_qubits = d*d
+    num_qubits = decoder_config.num_qubits
 
-    _xadj(j) = X_nbr[j]
-    _zadj(j) = Z_nbr[j]
+    
 
     ρ01 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
 
@@ -45,7 +44,7 @@ function get_sym_config(stabilizer, decoder_config)
 
     ρ1 = copy(ρ01)
 
-    qec_decoder = QEC_Helper.qec_decoder
+    qec_decoder = decoder_config.decoder
     σ = CState([(:d, d),
         (:qec_decoder, qec_decoder),
         (:x_syndrome_circuit, x_syndrome_circuit),
@@ -65,17 +64,20 @@ function get_sym_config(stabilizer, decoder_config)
     xlim = (nq-1)÷2
     zlim = (nq-1)÷2
 
-    decoder = QEC_Helper.qec_decoder(ctx, d, nq, xlim, zlim, _xadj, _zadj, bug)
+    decoder = qec_decoder(decoder_config.decoder_params...)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 
 Base.@kwdef mutable struct QecDecoderConfig
     d::Integer
-    X_nbr
-    Z_nbr
-    stabilizer
-    phases
-    ctx
+    num_qubits::Integer = d*d
+    _xadj = missing
+    _zadj = missing
+    stabilizer = missing
+    phases = missing
+    ctx = missing
+    decoder = missing
+    decoder_params = missing
     x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit
     z_syndrome_circuit = QEC_Defaults.z_syndrome_circuit
     decoder_algo_xz = QEC_Defaults.decoder_algo_xz
@@ -87,20 +89,12 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
     t0 = time()
     begin
         d = decoder_config.d
-        X_nbr = decoder_config.X_nbr
-        Z_nbr = decoder_config.Z_nbr
         stabilizer = decoder_config.stabilizer
-     
-        # stabilizer = get_stabilizer(d, X_nbr, Z_nbr)
-        
     end
 
-    
-    # println("X nbr: $(X_nbr)")
-    # println("Z nbr: $(Z_nbr)")
 
     # println("Encoded stabilizer : $(stabilizer)")
-    # println("Phases : $(phases)")
+    # println("Phases : $(decoder_config.phases)")
 
 
     @info "Decoder Configuration"

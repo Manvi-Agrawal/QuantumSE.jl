@@ -1,6 +1,12 @@
 using QuantumSE
 using Z3
 
+# include("QEC_Helper.jl")
+# using .QEC_Helper
+
+include("QEC_Pipeline.jl")
+using .QEC_Pipeline
+
 ctx = Context()
 
 function _xadj(d, idx)
@@ -130,20 +136,28 @@ end
 
 
 function get_phases(d)
-    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
-	    lx = _bv_const(ctx, "lx")
-	    lz = _bv_const(ctx, "lz")
-        
-	    for i in 1:d*d-1
-	    	phases[i] = _bv_val(ctx, 0)
-	    	phases[i+d*d] = _bv_val(ctx, 0)
-	    end
+    num_qubits = 2*d*d
 
-	    phases[d*d] = lx
-	    phases[2*d*d] = lz
+    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
+    lx = _bv_const(ctx, "lx")
+    lz = _bv_const(ctx, "lz")
+    
+    for i in 1:d*d-1
+        phases[i] = _bv_val(ctx, 0)
+        phases[i+d*d] = _bv_val(ctx, 0)
+    end
+
+    phases[d*d] = lx
+    phases[2*d*d] = lz
+
+    println("Type(phases): $(typeof(phases))")
+    println("Length(phases): $(length(phases))")
+
+    return phases
 end
 
 function get_stabilizer(d)
+    num_qubits = 2*d*d
     stabilizer = Matrix{Bool}(undef, num_qubits, 2*num_qubits)
 
     for i in 1:d*d-1
@@ -153,32 +167,67 @@ function get_stabilizer(d)
 
     stabilizer[d*d,:] = toric_lx1(d)
     stabilizer[2*d*d,:] = toric_lz1(d)
+
+    println("Type(stabilizer): $(typeof(stabilizer))")
+
+    return stabilizer
 end
 
+@qprog toric_decoder (d) begin
+
+    s_x = [x_syndrome_circuit(d, j) for j in 1:d*d]
+    s_z = [z_syndrome_circuit(d, j) for j in 1:d*d]
+    
+    r_x = decoder_algo_xz(d, s_x, "X")
+    r_z = decoder_algo_xz(d, s_z, "Z")
+    
+    for j in 1:2*d*d
+        sZ(j, r_x[j])
+        sX(j, r_z[j])
+    end
+
+    # a strange bug
+    e = reduce(&, r_z[1:(d-1)÷2])
+
+    sX(1, e)
+
+end
+
+# function toric_decoder(d, ctx, _xadj, _zadj)
+#     nq = 2*d*d
+#     xlim = (nq-1)÷2
+#     zlim = (nq-1)÷2
+
+#     decoder = QEC_Helper.qec_decoder(ctx, d, nq, xlim, zlim, _xadj, _zadj, bug)
+# end
 
 
 open("toric_code.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
-    for d in 3:20
+    for d in 3:7
         tm2 = time()
         # (X_nbr, Z_nbr) = get_nbr(d)
 
-        stabilizer = QEC_Helper.get_stabilizer(d, X_nbr, Z_nbr)
+        stabilizer = get_stabilizer(d)
 
-        
-        toric_decoder = QEC_Pipeline.QecDecoderConfig(
+        toric_decoder_params = (d)
+        toric_decoder_config = QEC_Pipeline.QecDecoderConfig(
             d=d,
-            X_nbr=X_nbr,
-            Z_nbr=Z_nbr,
+            num_qubits=2*d*d,
             stabilizer=stabilizer,
             phases= get_phases(d),
             ctx=ctx,
-            bug = rsc_bug)
+            _xadj=_xadj,
+            _zadj=_zadj,
+            decoder=toric_decoder,
+            decoder_params=toric_decoder_params)
 
-        toric_decoder.x_syndrome_circuit = toric_x_m
-        toric_decoder.z_syndrome_circuit = toric_z_m
-        toric_decoder.decoder_algo_xz = mwpm
+        toric_decoder_config.x_syndrome_circuit = toric_x_m
+        toric_decoder_config.z_syndrome_circuit = toric_z_m
+        toric_decoder_config.decoder_algo_xz = mwpm
+
+        
 
 
         tm1 = time()
@@ -189,7 +238,7 @@ open("toric_code.csv", "w") do io
 
         # println("Phases: $(phases)")
 
-        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(toric_decoder)
+        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(toric_decoder_config)
 
         init_config = (tm2-tm1)
         all += init_config

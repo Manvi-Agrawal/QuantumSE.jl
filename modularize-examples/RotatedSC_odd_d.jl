@@ -1,5 +1,7 @@
 using QuantumSE
 
+include("QEC_Defaults.jl")
+using .QEC_Defaults
 
 include("QEC_Pipeline.jl")
 using .QEC_Pipeline
@@ -116,7 +118,7 @@ function get_phases(d::Integer)
     return phases
 end
 
-function rsc_bug(ρ, r_x, r_z, d)
+function decoder_bug(ρ, r_x, r_z, d)
     println("RSC_bug")
     e = reduce(&, r_z[1:(d-1)÷2])
 
@@ -146,19 +148,32 @@ open("rsc.csv", "w") do io
 
     for d in 3:2:7
         tm2 = time()
+        nq = d*d
+        
         (X_nbr, Z_nbr) = get_nbr(d)
 
         stabilizer = QEC_Helper.get_stabilizer(d, X_nbr, Z_nbr)
 
+        _xadj(j) = X_nbr[j]
+        _zadj(j) = Z_nbr[j]
+
+        rsc_decoder = QEC_Helper.qec_decoder
+        xlim = (nq-1)÷2
+        zlim = (nq-1)÷2
+        rsc_bug = QEC_Defaults.bug
+        rsc_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, rsc_bug)
+
         
-        rsc_decoder = QEC_Pipeline.QecDecoderConfig(
+        rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
             d=d,
-            X_nbr=X_nbr,
-            Z_nbr=Z_nbr,
+            _xadj=_xadj,
+            _zadj=_zadj,
             stabilizer=stabilizer,
             phases= get_phases(d),
             ctx=ctx,
-            bug = rsc_bug)
+            bug = rsc_bug,
+            decoder=rsc_decoder,
+            decoder_params=rsc_decoder_params)
 
         tm1 = time()
         
@@ -168,7 +183,9 @@ open("rsc.csv", "w") do io
 
         # println("Phases: $(phases)")
 
-        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder)
+        
+
+        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder_config)
 
         init_config = (tm2-tm1)
         all += init_config
