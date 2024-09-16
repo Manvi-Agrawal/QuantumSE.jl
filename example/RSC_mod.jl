@@ -117,7 +117,9 @@ function rsc_bug(ρ, r_x, r_z, d)
     println("RSC_bug")
     e = reduce(&, r_z[1:(d-1)÷2])
 
-    sX(ρ, 1, e)
+    # sX(ρ, 1, e)
+    sX(1, e)
+
     println("RSC_bug end")
     nothing
 

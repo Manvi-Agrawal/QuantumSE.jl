@@ -76,7 +76,7 @@ end
     end
 
     # a strange bug
-    bug(ρ, r_x, r_z, d)
+    # bug(ρ, r_x, r_z, d)
 
     e = reduce(&, r_z[1:(d-1)÷2])
 
@@ -90,7 +90,7 @@ end
 
 
 
-function get_config(stabilizer, decoder_config)
+function get_sym_config(stabilizer, decoder_config)
     d = decoder_config.d
     phases = decoder_config.phases
     X_nbr = decoder_config.X_nbr
@@ -102,7 +102,7 @@ function get_config(stabilizer, decoder_config)
     bug = decoder_config.bug
 
 
-    # println("LOG-INFO: Inside get_config")
+    # println("LOG-INFO: Inside get_sym_config")
     num_qubits = d*d
 
     _xadj(j) = X_nbr[j]
@@ -122,6 +122,7 @@ function get_config(stabilizer, decoder_config)
         (:_xadj, _xadj),
         (:_zadj, _zadj),
         (:ctx, ctx),
+        (:bug, bug),
         (:decoder_algo_xz, decoder_algo_xz)
     ])
 
@@ -168,7 +169,7 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
     @info "Decoder Configuration"
     t1 = time()
     begin
-        (ρ01, ϕ_x1, cfg1) = get_config(stabilizer, decoder_config)
+        (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
         cfgs1 = QuantSymEx(cfg1)
     end
 
