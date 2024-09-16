@@ -1,6 +1,9 @@
 using QuantumSE
 using Z3
 
+include("QEC_Pipeline.jl")
+using .QEC_Pipeline
+
 ctx = Context()
 
 _adj(idx) = [idx, idx+1]
@@ -57,92 +60,88 @@ function repetition_lz(n)
     s
 end
 
-@qprog repetition_decoder (n) begin
-    s = [repetition_m_zz(n, j) for j in 1:n]
+@qprog repetition_decoder (nq) begin
+    s = [z_syndrome_circuit(nq, j) for j in 1:nq]
 
-    r = mwpm(n, s)
+    r = decoder_algo_xz(nq, s)
 
-    for j in 1:n
+    for j in 1:nq
         sX(j, r[j])
     end
 
-    e = reduce(&, r[1:((n-1)÷2)])
+    e = reduce(&, r[1:((nq-1)÷2)])
 
     sX(1, e)
 end
 
-function check_repetition_decoder(n)
-    @info "Initailization Stage"
-    t0 = time()
-    @time begin
-        num_qubits = n
+function get_phases(nq)
 
-	    stabilizer = Matrix{Bool}(undef, num_qubits, 2*num_qubits)
-	    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
-	    lx = _bv_const(ctx, "lx")
-	    lz = _bv_const(ctx, "lz")
+    phases = Vector{Z3.ExprAllocated}(undef, nq)
+    lx = _bv_const(ctx, "lx")
+    lz = _bv_const(ctx, "lz")
 
-	    @simd for i in 1:n-1
-	    	stabilizer[i+1,:] = repetition_s(n, i)
-	    	phases[i+1] = _bv_val(ctx, 0)
-	    end
-
-	    stabilizer[1,:] = repetition_lx(n)
-	    phases[1] = lx
-
-        σ = CState([(:n, n),
-            (:repetition_decoder, repetition_decoder),
-            (:repetition_m_zz, repetition_m_zz),
-            (:_adj, _adj),
-            (:ctx, ctx),
-            (:mwpm, mwpm)
-        ])
-
-        ρ₀ = from_stabilizer(num_qubits, stabilizer, phases, ctx)
-        ρ = copy(ρ₀)
-
-        num_x_errors = (n-1)÷2
-        x_errors = inject_errors(ρ, "X")
-        ϕ_x = _sum(ctx, x_errors, num_qubits) <= bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
-
-	    #num_z_errors = 0
-        #z_errors = inject_errors(ρ, "Z")
-        #ϕ_z = _sum(ctx, z_errors, num_qubits) <= bv_val(ctx, num_z_errors, _len2(num_qubits)+1)
-
-        cfg0 = SymConfig(repetition_decoder(n), σ, ρ)
+    for i in 1:nq-1
+        phases[i+1] = _bv_val(ctx, 0)
     end
 
-    @info "Symbolic Execution Stage"
-    t1 = time()
-    @time cfgs = QuantSymEx(cfg0)
+    phases[1] = lx
 
-    @info "SMT Solver Stage"
-    t2 = time()
-    @time begin
-        res = true
-        for cfg in cfgs
-            if !check_state_equivalence(
-                cfg.ρ, ρ₀, (ϕ_x #=& ϕ_z=#, cfg.ϕ[1], cfg.ϕ[2]),
-                `bitwuzla --smt-comp-mode true -rwl 0 -S kissat`)
-                res = false
-                break
-            end
-        end
-    end
+    println("Type(phases): $(typeof(phases))")
+    println("Length(phases): $(length(phases))")
 
-    t3 = time()
-
-    res, t3-t0, t1-t0, t2-t1, t3-t2
+    return phases
 end
 
-check_repetition_decoder(20) # precompile time
+function get_stabilizer(n)
+    num_qubits = n
 
-open("repetition_code.dat", "w") do io
-  println(io, "nq all init qse smt")
-  println("nq all init qse smt")
-  for j in 1:28
-    res, all, init, qse, smt = check_repetition_decoder(50*j)
-    println(io, "$(50*j) $(all) $(init) $(qse) $(smt)")
-    println("$(j)/28: $(50*j) $(all) $(init) $(qse) $(smt)")
-  end
+    stabilizer = Matrix{Bool}(undef, num_qubits, 2*num_qubits)
+
+    @simd for i in 1:n-1
+        stabilizer[i+1,:] = repetition_s(n, i)
+    end
+
+    stabilizer[1,:] = repetition_lx(n)
+
+    println("Type(stabilizer): $(typeof(stabilizer))")
+
+    return stabilizer
+end
+
+open("repetition_code.csv", "w") do io
+    println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
+
+    for n in 3:3
+        tm2 = time()
+
+        repetition_decoder_params = (n)
+        repetition_decoder_config = QEC_Pipeline.QecDecoderConfig(
+            d=n,
+            num_qubits=n,
+            stabilizer=get_stabilizer(n),
+            phases= get_phases(n),
+            ctx=ctx,
+            _zadj=_adj,
+            decoder=repetition_decoder,
+            decoder_params=repetition_decoder_params)
+
+        # repetition_decoder_config.x_syndrome_circuit = repetition_x_m
+        repetition_decoder_config.z_syndrome_circuit = repetition_m_zz
+        repetition_decoder_config.decoder_algo_xz = mwpm
+
+        tm1 = time()
+        
+        # println("X_nbr: $(X_nbr)")
+        # println("Z_nbr: $(Z_nbr)")
+        # println("Phases: $(phases)")
+
+        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(repetition_decoder_config)
+
+        init_config = (tm2-tm1)
+        all += init_config
+
+        println("d,res,nq,all,init_config, init,config,cons_gen,cons_sol")
+        println("$(n),$(res_d),$(n),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
+        println(io, "$(n),$(res_d),$(n),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
+    end
 end
