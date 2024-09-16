@@ -99,8 +99,10 @@ function get_config(stabilizer, phases, X_nbr, Z_nbr, d::Integer, ctx)
 
     ρ1 = copy(ρ01)
 
-    x_syndrome_circuit = qec_default_x_syn_ckt
-    z_syndrome_circuit = qec_default_z_syn_ckt
+    x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit
+    z_syndrome_circuit = QEC_Defaults.z_syndrome_circuit
+    decoder_algo_xz = QEC_Defaults.decoder_algo_xz
+
 
     σ = CState([(:d, d),
         (:qec_decoder, qec_decoder),
@@ -133,8 +135,8 @@ function check_qec_decoder(d::Integer, X_nbr, Z_nbr, phases, ctx)
     # println("X nbr: $(X_nbr)")
     # println("Z nbr: $(Z_nbr)")
 
-    println("Encoded stabilizer : $(stabilizer)")
-    println("Phases : $(phases)")
+    # println("Encoded stabilizer : $(stabilizer)")
+    # println("Phases : $(phases)")
 
 
     @info "Decoder Configuration"

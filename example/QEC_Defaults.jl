@@ -23,7 +23,7 @@ function decoder_algo_xz(ctx, d, s, s_type, nq, adj)
 end
 
 
-@qprog qec_default_x_syn_ckt (idx) begin
+@qprog x_syndrome_circuit (idx) begin
     b = _xadj(idx)
 
     nb = length(b)
@@ -46,7 +46,7 @@ end
     res
 end
 
-@qprog qec_default_z_syn_ckt (idx) begin
+@qprog z_syndrome_circuit (idx) begin
     b = _zadj(idx)
 
     nb = length(b)
@@ -63,6 +63,6 @@ end
 
 
 
-export decoder_algo_xz, qec_default_x_syn_ckt, qec_default_z_syn_ckt
+# export decoder_algo_xz, qec_default_x_syn_ckt, qec_default_z_syn_ckt
 
 end
