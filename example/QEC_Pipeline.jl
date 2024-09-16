@@ -86,8 +86,18 @@ end
 
 
 
-function get_config(stabilizer, phases, X_nbr, Z_nbr, d::Integer, ctx)
-    println("LOG-INFO: Inside get_config")
+function get_config(stabilizer, decoder_config)
+    d = decoder_config.d
+    phases = decoder_config.phases
+    X_nbr = decoder_config.X_nbr
+    Z_nbr = decoder_config.Z_nbr
+    ctx = decoder_config.ctx
+    x_syndrome_circuit = decoder_config.x_syndrome_circuit
+    z_syndrome_circuit = decoder_config.z_syndrome_circuit
+    decoder_algo_xz = decoder_config.decoder_algo_xz
+
+
+    # println("LOG-INFO: Inside get_config")
     num_qubits = d*d
 
     _xadj(j) = X_nbr[j]
@@ -95,13 +105,9 @@ function get_config(stabilizer, phases, X_nbr, Z_nbr, d::Integer, ctx)
 
     ρ01 = from_stabilizer(num_qubits, stabilizer, phases, ctx)
 
-    println("LOG-INFO: After from_stabilizer")
+    # println("LOG-INFO: After from_stabilizer")
 
     ρ1 = copy(ρ01)
-
-    x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit
-    z_syndrome_circuit = QEC_Defaults.z_syndrome_circuit
-    decoder_algo_xz = QEC_Defaults.decoder_algo_xz
 
 
     σ = CState([(:d, d),
@@ -122,13 +128,27 @@ function get_config(stabilizer, phases, X_nbr, Z_nbr, d::Integer, ctx)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 
+Base.@kwdef mutable struct QecDecoderConfig
+    d::Integer
+    X_nbr
+    Z_nbr
+    phases
+    ctx
+    x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit
+    z_syndrome_circuit = QEC_Defaults.z_syndrome_circuit
+    decoder_algo_xz = QEC_Defaults.decoder_algo_xz
+end
 
-
-function check_qec_decoder(d::Integer, X_nbr, Z_nbr, phases, ctx)
+function check_qec_decoder(decoder_config::QecDecoderConfig)
     @info "Initialization Stage: Encode State"
     t0 = time()
     begin
+        d = decoder_config.d
+        X_nbr = decoder_config.X_nbr
+        Z_nbr = decoder_config.Z_nbr
+     
         stabilizer = get_stabilizer(d, X_nbr, Z_nbr)
+        
     end
 
     
@@ -142,7 +162,7 @@ function check_qec_decoder(d::Integer, X_nbr, Z_nbr, phases, ctx)
     @info "Decoder Configuration"
     t1 = time()
     begin
-        (ρ01, ϕ_x1, cfg1) = get_config(stabilizer, phases, X_nbr, Z_nbr, d, ctx)
+        (ρ01, ϕ_x1, cfg1) = get_config(stabilizer, decoder_config)
         cfgs1 = QuantSymEx(cfg1)
     end
 
@@ -166,7 +186,7 @@ function check_qec_decoder(d::Integer, X_nbr, Z_nbr, phases, ctx)
     t3 = time()
 
     begin
-        res = solve_constraints(`bitwuzla --smt-comp-mode true -rwl 0 -S kissat`)
+        res = solve_constraints()
     end
 
     t4 = time()
@@ -174,6 +194,6 @@ function check_qec_decoder(d::Integer, X_nbr, Z_nbr, phases, ctx)
     res, t4-t0, t1-t0, t2-t1, t3-t2, t4-t3
 end
 
-export check_qec_decoder
+# export check_qec_decoder
 
 end

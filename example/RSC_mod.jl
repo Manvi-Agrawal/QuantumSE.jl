@@ -114,22 +114,43 @@ function get_phases(d::Integer)
 end
 
 
+rsc_d3 = QEC_Pipeline.QecDecoderConfig(
+            d=3,
+            X_nbr=get_nbr(3)[1],
+            Z_nbr=get_nbr(3)[2],
+            phases=get_phases(3),
+            ctx=ctx)
 
-# check_qec_decoder(3) # precompile time
+QEC_Pipeline.check_qec_decoder(rsc_d3) # precompile time
 # @info "precompile done..."
 
 open("surface_code.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
     for d in 3:2:7
+        tm2 = time()
         (X_nbr, Z_nbr) = get_nbr(d)
-        phases = get_phases(d)
-        println("X_nbr: $(X_nbr)")
-        println("Z_nbr: $(Z_nbr)")
+        
+        rsc_decoder = QEC_Pipeline.QecDecoderConfig(
+            d=d,
+            X_nbr=X_nbr,
+            Z_nbr=Z_nbr,
+            phases= get_phases(d),
+            ctx=ctx)
 
-        println("Phases: $(phases)")
+        tm1 = time()
+        
 
-        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(d, X_nbr, Z_nbr, phases, ctx)
+        # println("X_nbr: $(X_nbr)")
+        # println("Z_nbr: $(Z_nbr)")
+
+        # println("Phases: $(phases)")
+
+        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder)
+
+        init_config = (tm2-tm1)
+        # all += init
+
         println("d,res,nq,all,init,config,cons_gen,cons_sol")
         println("$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
         println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
