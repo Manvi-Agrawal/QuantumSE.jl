@@ -113,11 +113,14 @@ function get_phases(d::Integer)
     return phases
 end
 
-function rsc_bug(r_x, r_z, d)
+function rsc_bug(ctx, s_x, s_z, r_x, r_z, d)
     println("RSC_bug")
     e = reduce(&, r_z[1:(d-1)÷2])
 
-    QuantumSE.sX!(1, e)
+    sX(1, e)
+    println("RSC_bug end")
+    nothing
+
 end
 
 
@@ -128,7 +131,7 @@ rsc_d3 = QEC_Pipeline.QecDecoderConfig(
             phases=get_phases(3),
             ctx=ctx)
 
-QEC_Pipeline.check_qec_decoder(rsc_d3) # precompile time
+# QEC_Pipeline.check_qec_decoder(rsc_d3) # precompile time
 # @info "precompile done..."
 
 

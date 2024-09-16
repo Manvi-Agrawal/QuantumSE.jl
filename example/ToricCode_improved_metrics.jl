@@ -251,3 +251,4 @@ open("toric_code.csv", "w") do io
         println(io, "$(d),$(res_d),$(2*d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
     end
 end
+

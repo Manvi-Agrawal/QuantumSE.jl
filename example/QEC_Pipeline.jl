@@ -75,8 +75,14 @@ end
         sX(j, r_z[j])
     end
 
+    println("MANVI Debug sx")
     # a strange bug
-    bug(r_x, r_z, d)
+    e = reduce(&, r_z[1:(d-1)÷2])
+    # msX(1, e)
+    sX(1, e)
+    # bug(ctx, s_x, s_z, r_x, r_z, d)
+
+
 
     # println("Decoder end")
 end

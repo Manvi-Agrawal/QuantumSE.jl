@@ -132,6 +132,7 @@ end
         sX(j, r_z[j])
     end
 
+    # a strange bug
     e = reduce(&, r_z[1:((d-1)÷2)])
 
     sX(1, e)

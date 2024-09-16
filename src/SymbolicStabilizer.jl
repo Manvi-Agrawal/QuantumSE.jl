@@ -392,6 +392,8 @@ function Y!(q::SymStabilizerState, b)
 end
 
 function sX!(q::SymStabilizerState, b, s)
+    # println("Debug SX: q=$(q), b= $(b), s=$(s)")
+
     len = size(q.xzs, 1)÷2
     b6 = _mod(b)
     pw = _rem(b)
@@ -405,6 +407,27 @@ function sX!(q::SymStabilizerState, b, s)
     
     nothing
 end
+sX = sX!
+
+
+function msX!(q::SymStabilizerState, b, s)
+    # println("MANVI SX: q=$(q), b= $(b), s=$(s)")
+    len = size(q.xzs, 1)÷2
+    b6 = _mod(b)
+    pw = _rem(b)
+    
+    @inbounds @simd for j in 1:2*q.num_qubits
+        x, z = q.xzs[b6,j]&pw, q.xzs[b6+len,j]&pw
+        if ~iszero(z)
+            q.phases[j] = q.phases[j] ⊻ s
+        end
+    end
+    
+    nothing
+end
+
+
+msX = msX!
 
 function sZ!(q::SymStabilizerState, b, s)
     len = size(q.xzs, 1)÷2
@@ -469,7 +492,7 @@ function M!(q::SymStabilizerState, b, sym_name::String)
     end
 end
 
-CNOT, H, S, X, Y, Z, sX, sY, sZ, M = CNOT!, H!, S!, X!, Y!, Z!, sX!, sY!, sZ!, M!
+CNOT, H, S, X, Y, Z, sY, sZ, M = CNOT!, H!, S!, X!, Y!, Z!, sY!, sZ!, M!
 
 function inject_errors(q::SymStabilizerState, max_num_errors::Integer, error_type::String)
     terms = Vector{Z3.ExprAllocated}(undef, q.num_qubits)
