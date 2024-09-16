@@ -113,6 +113,13 @@ function get_phases(d::Integer)
     return phases
 end
 
+function rsc_bug(r_x, r_z, d)
+    println("RSC_bug")
+    e = reduce(&, r_z[1:(d-1)÷2])
+
+    QuantumSE.sX!(1, e)
+end
+
 
 rsc_d3 = QEC_Pipeline.QecDecoderConfig(
             d=3,
@@ -124,10 +131,12 @@ rsc_d3 = QEC_Pipeline.QecDecoderConfig(
 QEC_Pipeline.check_qec_decoder(rsc_d3) # precompile time
 # @info "precompile done..."
 
-open("surface_code.csv", "w") do io
+
+
+open("rsc.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
-    for d in 3:2:7
+    for d in 3:2:3
         tm2 = time()
         (X_nbr, Z_nbr) = get_nbr(d)
         
@@ -136,7 +145,8 @@ open("surface_code.csv", "w") do io
             X_nbr=X_nbr,
             Z_nbr=Z_nbr,
             phases= get_phases(d),
-            ctx=ctx)
+            ctx=ctx,
+            bug = rsc_bug)
 
         tm1 = time()
         

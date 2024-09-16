@@ -54,6 +54,10 @@ end
     res
 end
 
+function bug(r_x, r_z, d)
+    println("NO BUG....")
+end
+
 
 
 # export decoder_algo_xz, qec_default_x_syn_ckt, qec_default_z_syn_ckt

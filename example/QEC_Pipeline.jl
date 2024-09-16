@@ -52,8 +52,8 @@ function get_stabilizer(d::Integer, X_nbr, Z_nbr)
 
 end
 
-@qprog qec_decoder (ctx, d) begin
-    # print("Decoder start")
+@qprog qec_decoder (ctx, d, bug) begin
+    # println("Decoder start")
 
     nq = d*d
     lim = (nq-1)÷2
@@ -76,11 +76,9 @@ end
     end
 
     # a strange bug
-    # e = reduce(&, r_z[1:(d-1)÷2])
+    bug(r_x, r_z, d)
 
-    # sX(1, e)
-
-    # print("Decoder end")
+    # println("Decoder end")
 end
 
 
@@ -95,6 +93,7 @@ function get_config(stabilizer, decoder_config)
     x_syndrome_circuit = decoder_config.x_syndrome_circuit
     z_syndrome_circuit = decoder_config.z_syndrome_circuit
     decoder_algo_xz = decoder_config.decoder_algo_xz
+    bug = decoder_config.bug
 
 
     # println("LOG-INFO: Inside get_config")
@@ -124,7 +123,7 @@ function get_config(stabilizer, decoder_config)
     x_errors = inject_errors(ρ1, "X")
     ϕ_x1 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
   
-    decoder = qec_decoder(ctx, d)
+    decoder = qec_decoder(ctx, d, bug)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 
@@ -137,6 +136,7 @@ Base.@kwdef mutable struct QecDecoderConfig
     x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit
     z_syndrome_circuit = QEC_Defaults.z_syndrome_circuit
     decoder_algo_xz = QEC_Defaults.decoder_algo_xz
+    bug = QEC_Defaults.bug
 end
 
 function check_qec_decoder(decoder_config::QecDecoderConfig)
