@@ -75,6 +75,7 @@ end
         sX(j, r_z[j])
     end
 
+    println("MANVI Debug sx")
     # a strange bug
     # bug(ρ, r_x, r_z, d)
 
