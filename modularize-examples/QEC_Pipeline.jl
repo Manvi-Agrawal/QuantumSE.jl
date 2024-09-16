@@ -76,7 +76,7 @@ Base.@kwdef mutable struct QecDecoderConfig
     ctx
     _xadj = missing
     _zadj = missing
-    decoder = missing
+    decoder = QEC_Defaults.qec_decoder
     decoder_params = missing
     x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit
     z_syndrome_circuit = QEC_Defaults.z_syndrome_circuit
@@ -89,6 +89,7 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
     t0 = time()
     begin
         d = decoder_config.d
+        nq = decoder_config.num_qubits
         stabilizer = decoder_config.stabilizer
         (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
     end
@@ -125,7 +126,34 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
 
     t4 = time()
 
-    res, t4-t0, t1-t0, t2-t1, t3-t2, t4-t3
+    res, d, nq, t4-t0, t1-t0, t2-t1, t3-t2, t4-t3
+end
+
+function qec_runner(file, get_decoder_config, range)
+    qec_pre = get_decoder_config(range[1])
+    QEC_Pipeline.check_qec_decoder(qec_pre)
+    @info "PRECOMPLIED qec code..."
+
+    open(file, "w") do io
+        println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
+    
+        for r in range
+            tm2 = time()
+    
+            decoder_config = get_decoder_config(r...)
+    
+            tm1 = time()
+    
+            res_d, d, nq, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(decoder_config)
+    
+            init_config = (tm2-tm1)
+            all += init_config
+    
+            println("d,res,nq,all,init_config,init,config,cons_gen,cons_sol")
+            println("$(d),$(res_d),$(nq),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
+            println(io, "$(d),$(res_d),$(nq),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
+        end
+    end    
 end
 
 end

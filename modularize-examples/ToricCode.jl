@@ -193,50 +193,26 @@ end
 
 end
 
+function get_toric_decoder_config(d)
+    stabilizer = get_stabilizer(d)
 
-open("toric_code.csv", "w") do io
-    println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
+    toric_decoder_config = QEC_Pipeline.QecDecoderConfig(
+        d=d,
+        num_qubits=2*d*d,
+        stabilizer=stabilizer,
+        phases= get_phases(d),
+        ctx=ctx,
+        _xadj=_xadj,
+        _zadj=_zadj,
+        )
 
-    for d in 3:7
-        tm2 = time()
-        # (X_nbr, Z_nbr) = get_nbr(d)
+    toric_decoder_config.x_syndrome_circuit = toric_x_m
+    toric_decoder_config.z_syndrome_circuit = toric_z_m
+    toric_decoder_config.decoder_algo_xz = mwpm
+    toric_decoder_config.decoder = toric_decoder
+    toric_decoder_config.decoder_params = (d)
 
-        stabilizer = get_stabilizer(d)
-
-        toric_decoder_params = (d)
-        toric_decoder_config = QEC_Pipeline.QecDecoderConfig(
-            d=d,
-            num_qubits=2*d*d,
-            stabilizer=stabilizer,
-            phases= get_phases(d),
-            ctx=ctx,
-            _xadj=_xadj,
-            _zadj=_zadj,
-            decoder=toric_decoder,
-            decoder_params=toric_decoder_params)
-
-        toric_decoder_config.x_syndrome_circuit = toric_x_m
-        toric_decoder_config.z_syndrome_circuit = toric_z_m
-        toric_decoder_config.decoder_algo_xz = mwpm
-
-        
-
-
-        tm1 = time()
-        
-
-        # println("X_nbr: $(X_nbr)")
-        # println("Z_nbr: $(Z_nbr)")
-
-        # println("Phases: $(phases)")
-
-        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(toric_decoder_config)
-
-        init_config = (tm2-tm1)
-        all += init_config
-
-        println("d,res,nq,all,init_config, init,config,cons_gen,cons_sol")
-        println("$(d),$(res_d),$(2*d*d),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-        println(io, "$(d),$(res_d),$(2*d*d),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-    end
+    return toric_decoder_config
 end
+
+QEC_Pipeline.qec_runner("toric_code.csv", get_toric_decoder_config, 3:10)
