@@ -108,40 +108,24 @@ function get_stabilizer(n)
     return stabilizer
 end
 
-open("repetition_code.csv", "w") do io
-    println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
+function get_repetition_decoder_config(n)
+    repetition_decoder_params = (n)
+    repetition_decoder_config = QEC_Pipeline.QecDecoderConfig(
+        d=n,
+        num_qubits=n,
+        stabilizer=get_stabilizer(n),
+        phases= get_phases(n),
+        ctx=ctx,
+        _zadj=_adj,
+        decoder=repetition_decoder,
+        decoder_params=repetition_decoder_params)
 
-    for n in 3:3
-        tm2 = time()
+    # repetition_decoder_config.x_syndrome_circuit = repetition_m_xx
+    repetition_decoder_config.z_syndrome_circuit = repetition_m_zz
+    repetition_decoder_config.decoder_algo_xz = mwpm
 
-        repetition_decoder_params = (n)
-        repetition_decoder_config = QEC_Pipeline.QecDecoderConfig(
-            d=n,
-            num_qubits=n,
-            stabilizer=get_stabilizer(n),
-            phases= get_phases(n),
-            ctx=ctx,
-            _zadj=_adj,
-            decoder=repetition_decoder,
-            decoder_params=repetition_decoder_params)
-
-        # repetition_decoder_config.x_syndrome_circuit = repetition_x_m
-        repetition_decoder_config.z_syndrome_circuit = repetition_m_zz
-        repetition_decoder_config.decoder_algo_xz = mwpm
-
-        tm1 = time()
-        
-        # println("X_nbr: $(X_nbr)")
-        # println("Z_nbr: $(Z_nbr)")
-        # println("Phases: $(phases)")
-
-        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(repetition_decoder_config)
-
-        init_config = (tm2-tm1)
-        all += init_config
-
-        println("d,res,nq,all,init_config, init,config,cons_gen,cons_sol")
-        println("$(n),$(res_d),$(n),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-        println(io, "$(n),$(res_d),$(n),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-    end
+    return repetition_decoder_config
 end
+
+QEC_Pipeline.qec_runner("repetition_code.csv", get_repetition_decoder_config, 3:5)
+
