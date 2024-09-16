@@ -171,10 +171,10 @@ open("rsc.csv", "w") do io
         res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder)
 
         init_config = (tm2-tm1)
-        # all += init
+        all += init_config
 
-        println("d,res,nq,all,init,config,cons_gen,cons_sol")
-        println("$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
-        println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
+        println("d,res,nq,all,init_config, init,config,cons_gen,cons_sol")
+        println("$(d),$(res_d),$(d*d),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
+        println(io, "$(d),$(res_d),$(d*d),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
     end
 end
