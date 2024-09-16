@@ -22,26 +22,19 @@ function decoder_algo_xz(ctx, d, s, s_type, nq, adj)
     (r, ϕ₁, ϕ₂ & ϕ₃)
 end
 
-
 @qprog x_syndrome_circuit (idx) begin
     b = _xadj(idx)
 
     nb = length(b)
-
-    H(b[1])
-
     for j in 2:nb
         CNOT(b[1], b[j])
     end
     H(b[1])
     res = M(b[1])
-
     H(b[1])
     for j in nb:-1:2
         CNOT(b[1], b[j])
     end
-    H(b[1])
-
 
     res
 end
