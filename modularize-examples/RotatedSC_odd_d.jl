@@ -139,13 +139,6 @@ function decoder_bug(ρ, r_x, r_z, d)
 end
 
 
-# rsc_d3 = QEC_Pipeline.QecDecoderConfig(
-#             d=3,
-#             X_nbr=get_nbr(3)[1],
-#             Z_nbr=get_nbr(3)[2],
-#             phases=get_phases(3),
-#             ctx=ctx)
-
 # QEC_Pipeline.check_qec_decoder(rsc_d3) # precompile time
 # @info "precompile done..."
 
@@ -154,7 +147,7 @@ end
 open("rsc.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
-    for d in 3:2:3
+    for d in 3:2:7
         tm2 = time()
         nq = d*d
         
@@ -168,12 +161,8 @@ open("rsc.csv", "w") do io
         rsc_decoder = QEC_Defaults.qec_decoder
         nx = (nq-1)÷2
         nz = (nq-1)÷2
-        rsc_bug = QEC_Defaults.bug
-        # rsc_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, rsc_bug)
         rsc_decoder_params = (nx, nz, nq, d, ctx)
 
-
-        
         rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
             d=d,
             num_qubits = d*d,
@@ -182,23 +171,19 @@ open("rsc.csv", "w") do io
             stabilizer=stabilizer,
             phases= get_phases(d),
             ctx=ctx,
-            bug = rsc_bug,
             decoder=rsc_decoder,
             decoder_params=rsc_decoder_params)
 
         tm1 = time()
         
 
-        println("X_nbr: $(X_nbr)")
-        println("Z_nbr: $(Z_nbr)")
-        println("rsc_l_op: $(rsc_l_op(d))")
+        # println("X_nbr: $(X_nbr)")
+        # println("Z_nbr: $(Z_nbr)")
+        # println("rsc_l_op: $(rsc_l_op(d))")
 
         
-        println("Encoded stabilizer: $(stabilizer)")
-
+        # println("Encoded stabilizer: $(stabilizer)")
         # println("Phases: $(phases)")
-
-        
 
         res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder_config)
 
