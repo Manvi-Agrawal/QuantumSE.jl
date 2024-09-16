@@ -4,17 +4,6 @@ module QEC_Defaults
 using QuantumSE
 using Z3
 
-N4 = 4
-N2 = 2
-
-AD4 = 4
-AD2_H = 2
-AD2_V = 2
-
-ctx = Context()
-
-
-
 
 function decoder_algo_xz(ctx, d, s, s_type, nq, adj)
 
@@ -74,6 +63,6 @@ end
 
 
 
-export decoder_algo_xz, qec_default_x_syn_ckt, qec_default_z_syn_ckt, qec_decoder
+export decoder_algo_xz, qec_default_x_syn_ckt, qec_default_z_syn_ckt
 
 end

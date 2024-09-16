@@ -58,8 +58,7 @@ end
     nq = d*d
     lim = (nq-1)÷2
 
-    x_syndrome_circuit = qec_default_x_syn_ckt
-    z_syndrome_circuit = qec_default_z_syn_ckt
+    
 
     s_x = [x_syndrome_circuit(j) for j in 1:lim]
     s_z = [z_syndrome_circuit(j) for j in 1:lim]
@@ -100,10 +99,13 @@ function get_config(stabilizer, phases, X_nbr, Z_nbr, d::Integer, ctx)
 
     ρ1 = copy(ρ01)
 
+    x_syndrome_circuit = qec_default_x_syn_ckt
+    z_syndrome_circuit = qec_default_z_syn_ckt
+
     σ = CState([(:d, d),
         (:qec_decoder, qec_decoder),
-        (:qec_default_x_syn_ckt, qec_default_x_syn_ckt),
-        (:qec_default_z_syn_ckt, qec_default_z_syn_ckt),
+        (:x_syndrome_circuit, x_syndrome_circuit),
+        (:z_syndrome_circuit, z_syndrome_circuit),
         (:_xadj, _xadj),
         (:_zadj, _zadj),
         (:ctx, ctx),
