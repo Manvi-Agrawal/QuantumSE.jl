@@ -85,30 +85,33 @@ Base.@kwdef mutable struct QecDecoderConfig
 end
 
 function check_qec_decoder(decoder_config::QecDecoderConfig)
-    @info "Initialization Stage: Encode State"
+    @info "Initialization Stage"
     t0 = time()
     begin
         d = decoder_config.d
         stabilizer = decoder_config.stabilizer
+        # (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
     end
 
 
     # println("Encoded stabilizer : $(stabilizer)")
     # println("Phases : $(decoder_config.phases)")
+    
 
+    # Res should be true initially, set false to disable later code
+    res = true
 
-    @info "Decoder Configuration"
     t1 = time()
-    begin
+    if res
+        @info "Symbolic Execution"
         (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
-        cfgs1 = QuantSymEx(cfg1)
+        cfgs1 = res ? QuantSymEx(cfg1) : cfg1
     end
 
-    @info "Constraint Generation"
     t2 = time()
+    if res
+        @info "Constraint Generation"
 
-    begin
-        res = true
         for cfg in cfgs1
             if res && !generate_constraints(
                 cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z2=#, cfg.ϕ[1], cfg.ϕ[2]),
@@ -117,14 +120,13 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
                 break
             end
         end
-
     end
 
-    @info "Constraint Solver"
     t3 = time()
-
-    begin
-        res = solve_constraints()
+    if res
+        @info "Constraint Solver"
+    
+        res = res && solve_constraints()
     end
 
     t4 = time()

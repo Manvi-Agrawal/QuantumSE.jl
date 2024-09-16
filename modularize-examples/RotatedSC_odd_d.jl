@@ -158,10 +158,12 @@ open("rsc.csv", "w") do io
         _zadj(j) = Z_nbr[j]
 
         rsc_decoder = QEC_Helper.qec_decoder
-        xlim = (nq-1)÷2
-        zlim = (nq-1)÷2
+        nx = (nq-1)÷2
+        nz = (nq-1)÷2
         rsc_bug = QEC_Defaults.bug
-        rsc_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, rsc_bug)
+        # rsc_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, rsc_bug)
+        rsc_decoder_params = (nx, nz, nq, d, ctx)
+
 
         
         rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
