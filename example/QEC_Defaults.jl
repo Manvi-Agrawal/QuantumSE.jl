@@ -54,7 +54,7 @@ end
     res
 end
 
-function bug(ctx, s_x, s_z, r_x, r_z, d)
+function bug(ρ, r_x, r_z, d)
     println("NO BUG....")
 end
 

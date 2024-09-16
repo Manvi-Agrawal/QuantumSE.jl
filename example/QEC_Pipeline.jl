@@ -52,7 +52,7 @@ function get_stabilizer(d::Integer, X_nbr, Z_nbr)
 
 end
 
-@qprog qec_decoder (ctx, d, bug) begin
+@qprog qec_decoder (ctx, ρ, d, bug) begin
     # println("Decoder start")
 
     nq = d*d
@@ -75,12 +75,12 @@ end
         sX(j, r_z[j])
     end
 
-    println("MANVI Debug sx")
     # a strange bug
+    bug(ρ, r_x, r_z, d)
+
     e = reduce(&, r_z[1:(d-1)÷2])
-    # msX(1, e)
+
     sX(1, e)
-    # bug(ctx, s_x, s_z, r_x, r_z, d)
 
 
 
@@ -129,7 +129,7 @@ function get_config(stabilizer, decoder_config)
     x_errors = inject_errors(ρ1, "X")
     ϕ_x1 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
   
-    decoder = qec_decoder(ctx, d, bug)
+    decoder = qec_decoder(ctx, ρ1, d, bug)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 

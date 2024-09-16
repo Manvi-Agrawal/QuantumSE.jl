@@ -411,7 +411,7 @@ sX = sX!
 
 
 function msX!(q::SymStabilizerState, b, s)
-    # println("MANVI SX: q=$(q), b= $(b), s=$(s)")
+    println("MANVI SX: q=$(q), b= $(b), s=$(s)")
     len = size(q.xzs, 1)÷2
     b6 = _mod(b)
     pw = _rem(b)

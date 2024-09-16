@@ -113,11 +113,11 @@ function get_phases(d::Integer)
     return phases
 end
 
-function rsc_bug(ctx, s_x, s_z, r_x, r_z, d)
+function rsc_bug(ρ, r_x, r_z, d)
     println("RSC_bug")
     e = reduce(&, r_z[1:(d-1)÷2])
 
-    sX(1, e)
+    sX(ρ, 1, e)
     println("RSC_bug end")
     nothing
 
