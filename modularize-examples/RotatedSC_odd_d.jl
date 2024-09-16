@@ -4,6 +4,9 @@ using QuantumSE
 include("QEC_Pipeline.jl")
 using .QEC_Pipeline
 
+include("QEC_Helper.jl")
+using .QEC_Helper
+
 using Z3
 
 N4 = 4
@@ -126,12 +129,12 @@ function rsc_bug(ρ, r_x, r_z, d)
 end
 
 
-rsc_d3 = QEC_Pipeline.QecDecoderConfig(
-            d=3,
-            X_nbr=get_nbr(3)[1],
-            Z_nbr=get_nbr(3)[2],
-            phases=get_phases(3),
-            ctx=ctx)
+# rsc_d3 = QEC_Pipeline.QecDecoderConfig(
+#             d=3,
+#             X_nbr=get_nbr(3)[1],
+#             Z_nbr=get_nbr(3)[2],
+#             phases=get_phases(3),
+#             ctx=ctx)
 
 # QEC_Pipeline.check_qec_decoder(rsc_d3) # precompile time
 # @info "precompile done..."
@@ -144,11 +147,15 @@ open("rsc.csv", "w") do io
     for d in 3:2:3
         tm2 = time()
         (X_nbr, Z_nbr) = get_nbr(d)
+
+        stabilizer = QEC_Helper.get_stabilizer(d, X_nbr, Z_nbr)
+
         
         rsc_decoder = QEC_Pipeline.QecDecoderConfig(
             d=d,
             X_nbr=X_nbr,
             Z_nbr=Z_nbr,
+            stabilizer=stabilizer,
             phases= get_phases(d),
             ctx=ctx,
             bug = rsc_bug)

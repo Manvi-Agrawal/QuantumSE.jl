@@ -125,25 +125,7 @@ function toric_lz2(d::Integer)
 	s
 end
 
-@qprog toric_decoder (d) begin
 
-    s_x = [toric_x_m(d, j) for j in 1:d*d]
-    s_z = [toric_z_m(d, j) for j in 1:d*d]
-    
-    r_x = mwpm(d, s_x, "X")
-    r_z = mwpm(d, s_z, "Z")
-    
-    for j in 1:2*d*d
-        sZ(j, r_x[j])
-        sX(j, r_z[j])
-    end
-
-    # a strange bug
-    e = reduce(&, r_z[1:(d-1)÷2])
-
-    sX(1, e)
-
-end
 
 function check_toric_decoder(d::Integer)
 
@@ -263,3 +245,38 @@ open("toric_code.dat", "w") do io
     println("$(d)/27: $(d*d*2) $(all) $(init) $(qse) $(smt)")
   end
 end
+
+open("rsc.csv", "w") do io
+    println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
+
+    for d in 4:15
+        tm2 = time()
+        (X_nbr, Z_nbr) = get_nbr(d)
+        
+        rsc_decoder = QEC_Pipeline.QecDecoderConfig(
+            d=d,
+            X_nbr=X_nbr,
+            Z_nbr=Z_nbr,
+            phases= get_phases(d),
+            ctx=ctx,
+            bug = rsc_bug)
+
+        tm1 = time()
+        
+
+        # println("X_nbr: $(X_nbr)")
+        # println("Z_nbr: $(Z_nbr)")
+
+        # println("Phases: $(phases)")
+
+        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder)
+
+        init_config = (tm2-tm1)
+        # all += init
+
+        println("d,res,nq,all,init,config,cons_gen,cons_sol")
+        println("$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
+        println(io, "$(d),$(res_d),$(d*d),$(all),$(init),$(config),$(cons_gen),$(cons_sol)")
+    end
+end
+
