@@ -8,6 +8,9 @@ using Z3
 include("QEC_Defaults.jl")
 using .QEC_Defaults
 
+include("QEC_Helper.jl")
+using .QEC_Helper
+
 
 N4 = 4
 N2 = 2
@@ -17,47 +20,6 @@ AD2_H = 2
 AD2_V = 2
 
 ctx = Context()
-
-
-
-
-@qprog qec_decoder (ctx, ρ, d, bug) begin
-    # println("Decoder start")
-
-    nq = d*d
-    lim = (nq-1)÷2
-
-    
-
-    s_x = [x_syndrome_circuit(j) for j in 1:lim]
-    s_z = [z_syndrome_circuit(j) for j in 1:lim]
-
-    r_x = decoder_algo_xz(ctx, d, s_x, "X", nq, _xadj)
-    r_z = decoder_algo_xz(ctx, d, s_z, "Z", nq, _zadj)
-
-    # print("rx=$(r_x)")
-    # print("rz=$(r_z)")
-
-
-    for j in 1:d*d
-        sZ(j, r_x[j])
-        sX(j, r_z[j])
-    end
-
-    # a strange bug
-    # bug(ρ, r_x, r_z, d)
-
-    e = reduce(&, r_z[1:(d-1)÷2])
-
-    sX(1, e)
-
-
-
-    # println("Decoder end")
-end
-
-
-
 
 function get_sym_config(stabilizer, decoder_config)
     d = decoder_config.d
@@ -83,7 +45,7 @@ function get_sym_config(stabilizer, decoder_config)
 
     ρ1 = copy(ρ01)
 
-
+    qec_decoder = QEC_Helper.qec_decoder
     σ = CState([(:d, d),
         (:qec_decoder, qec_decoder),
         (:x_syndrome_circuit, x_syndrome_circuit),
@@ -99,7 +61,11 @@ function get_sym_config(stabilizer, decoder_config)
     x_errors = inject_errors(ρ1, "X")
     ϕ_x1 = _sum(ctx, x_errors, num_qubits) == bv_val(ctx, num_x_errors, _len2(num_qubits)+1)
   
-    decoder = qec_decoder(ctx, ρ1, d, bug)
+    nq = num_qubits
+    xlim = (nq-1)÷2
+    zlim = (nq-1)÷2
+
+    decoder = QEC_Helper.qec_decoder(ctx, d, nq, xlim, zlim, _xadj, _zadj, bug)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 

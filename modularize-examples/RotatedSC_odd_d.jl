@@ -144,7 +144,7 @@ end
 open("rsc.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
-    for d in 3:2:3
+    for d in 3:2:7
         tm2 = time()
         (X_nbr, Z_nbr) = get_nbr(d)
 
