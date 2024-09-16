@@ -118,7 +118,7 @@ function get_phases(HXt, HZt)
 end
 
 
-open("rsc.csv", "w") do io
+open("tanner.csv", "w") do io
     println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
     for k in 1:4
@@ -135,14 +135,14 @@ open("rsc.csv", "w") do io
         (_xadj, _zadj) = get_adj(HXt, HZt, nx, nz)
 
 
-        rsc_decoder = QEC_Helper.qec_decoder
-        rsc_bug = QEC_Defaults.bug
+        tanner_decoder = QEC_Helper.qec_decoder
+        tanner_bug = QEC_Defaults.bug
 
         d = 6 # min(dx, dz)
-        # rsc_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, rsc_bug)
-        rsc_decoder_params = (nx, nz, nq, d, ctx)
+        # tanner_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, tanner_bug)
+        tanner_decoder_params = (nx, nz, nq, d, ctx)
         
-        rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
+        tanner_decoder_config = QEC_Pipeline.QecDecoderConfig(
             d=d,
             num_qubits = nq,
             _xadj=_xadj,
@@ -150,9 +150,9 @@ open("rsc.csv", "w") do io
             stabilizer=get_stabilizer(HXt, HZt),
             phases= get_phases(HXt, HZt),
             ctx=ctx,
-            bug = rsc_bug,
-            decoder=rsc_decoder,
-            decoder_params=rsc_decoder_params)
+            bug = tanner_bug,
+            decoder=tanner_decoder,
+            decoder_params=tanner_decoder_params)
 
         tm1 = time()
         
@@ -162,7 +162,7 @@ open("rsc.csv", "w") do io
 
         # println("Phases: $(phases)")
 
-        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder_config)
+        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(tanner_decoder_config)
 
         init_config = (tm2-tm1)
         all += init_config
