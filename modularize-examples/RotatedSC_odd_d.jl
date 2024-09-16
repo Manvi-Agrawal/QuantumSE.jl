@@ -139,59 +139,31 @@ function decoder_bug(ρ, r_x, r_z, d)
 end
 
 
-# QEC_Pipeline.check_qec_decoder(rsc_d3) # precompile time
-# @info "precompile done..."
-
-
-
-open("rsc.csv", "w") do io
-    println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
-
-    for d in 3:2:7
-        tm2 = time()
-        nq = d*d
+function get_rsc_decoder_config(d::Integer)
+    nq = d*d
         
-        (X_nbr, Z_nbr) = get_nbr(d)
+    (X_nbr, Z_nbr) = get_nbr(d)
 
-        stabilizer = QEC_Helper.get_stabilizer_from_nbr(nq, X_nbr, Z_nbr, rsc_l_op(d))
+    stabilizer = QEC_Helper.get_stabilizer_from_nbr(nq, X_nbr, Z_nbr, rsc_l_op(d))
 
-        _xadj(j) = X_nbr[j]
-        _zadj(j) = Z_nbr[j]
+    _xadj(j) = X_nbr[j]
+    _zadj(j) = Z_nbr[j]
 
-        rsc_decoder = QEC_Defaults.qec_decoder
-        nx = (nq-1)÷2
-        nz = (nq-1)÷2
-        rsc_decoder_params = (nx, nz, nq, d, ctx)
+    nx = (nq-1)÷2
+    nz = (nq-1)÷2
+    rsc_decoder_params = (nx, nz, nq, d, ctx)
 
-        rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
-            d=d,
-            num_qubits = d*d,
-            _xadj=_xadj,
-            _zadj=_zadj,
-            stabilizer=stabilizer,
-            phases= get_phases(d),
-            ctx=ctx,
-            decoder=rsc_decoder,
-            decoder_params=rsc_decoder_params)
+    rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
+        d=d,
+        num_qubits = nq,
+        _xadj=_xadj,
+        _zadj=_zadj,
+        stabilizer=stabilizer,
+        phases= get_phases(d),
+        ctx=ctx,
+        decoder_params=rsc_decoder_params)
 
-        tm1 = time()
-        
-
-        # println("X_nbr: $(X_nbr)")
-        # println("Z_nbr: $(Z_nbr)")
-        # println("rsc_l_op: $(rsc_l_op(d))")
-
-        
-        # println("Encoded stabilizer: $(stabilizer)")
-        # println("Phases: $(phases)")
-
-        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder_config)
-
-        init_config = (tm2-tm1)
-        all += init_config
-
-        println("d,res,nq,all,init_config, init,config,cons_gen,cons_sol")
-        println("$(d),$(res_d),$(d*d),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-        println(io, "$(d),$(res_d),$(d*d),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-    end
+    return rsc_decoder_config
 end
+
+QEC_Pipeline.qec_runner("rsc.csv",get_rsc_decoder_config, 3:2:7)
