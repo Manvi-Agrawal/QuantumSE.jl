@@ -101,14 +101,14 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
     # Res should be true initially, set false to disable later code
     res = true
 
-    t1 = time()
-    if res
+    begin
+        t1 = time()
         @info "Symbolic Execution"
-        cfgs1 = res ? QuantSymEx(cfg1) : cfg1
+        cfgs1 = res ? QuantSymEx(cfg1) : [cfg1]
     end
 
-    t2 = time()
-    if res
+    begin
+        t2 = time()
         @info "Constraint Generation"
 
         for cfg in cfgs1
@@ -121,10 +121,9 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
         end
     end
 
-    t3 = time()
-    if res
+    begin
+        t3 = time()
         @info "Constraint Solver"
-    
         res = res && solve_constraints()
     end
 
