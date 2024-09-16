@@ -3,6 +3,15 @@ using Z3
 using SparseArrays
 using LinearAlgebra: nullspace
 
+include("QEC_Defaults.jl")
+using .QEC_Defaults
+
+include("QEC_Pipeline.jl")
+using .QEC_Pipeline
+
+include("QEC_Helper.jl")
+using .QEC_Helper
+
 ctx = Z3.Context()
 
 struct PrimeG <: AbstractGroup
@@ -71,204 +80,96 @@ function TannerCode(G::Vector{<:AbstractGroup}, A::Vector{<:AbstractGroup}, B::V
     HXt, HZt
 end
 
-function css_check(d, s, s_type, nq, adj)
 
-    ## pre-condition
-    ϕ₁ = bool_val(ctx, true)
+function get_adj(HXt, HZt, nx, nz)
+    X_idxs = [findall(!iszero, HXt[:,j]) for j in 1:nx]
+    Z_idxs = [findall(!iszero, HZt[:,j]) for j in 1:nz]
+    _xadj(i) = X_idxs[i]
+    _zadj(i) = Z_idxs[i]
 
-    ## post-condition
-    ϕ₂ = bool_val(ctx, true)
-    r = [_bv_const(ctx, "r_$(s_type)_$(j)") for j in 1:nq]
-    for j in 1:length(s)
-        ϕ₂ = ϕ₂ & (s[j] ⊻ reduce(⊻,  r[adj(j)]) == _bv_val(ctx, 0))
-    end
-
-    ϕ₃ = (sum( (x -> concat(bv_val(ctx, 0, _len2(nq)), x)).(r) ) <= bv_val(ctx, (d-1)÷2, _len2(nq)+1))
-
-    (r, ϕ₁, ϕ₂ & ϕ₃)
+    return (_xadj, _zadj)
 end
 
-@qprog tanner_x_m (idx) begin
-    b = _xadj(idx)
+function get_tanner_code(m, k)
+    aa = k
+    G = [PrimeG(7^m*aa, j-1) for j in 1:7^m*aa]
+    A = [PrimeG(7^m*aa, (j-1)*7^(m-1)*aa) for j in 1:7]
+    B = [PrimeG(7^m*aa, (j-1)*7^(m-1)*aa) for j in 1:7]
 
-    nb = length(b)
-    for j in 2:nb
-        CNOT(b[1], b[j])
-    end
-    H(b[1])
-    res = M(b[1])
-    H(b[1])
-    for j in nb:-1:2
-        CNOT(b[1], b[j])
-    end
+    HA = Hamming743
+    HAt = Hamming733
+    HB = Hamming733
+    HBt = Hamming743
 
-    res
+    return TannerCode(G, A, B, HA, HAt, HB, HBt)
+
 end
 
-@qprog tanner_z_m (idx) begin
-    b = _zadj(idx)
+function get_stabilizer(HXt, HZt)
+    stabilizer, dx, dz = stabilizer_from_css_code(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
 
-    nb = length(b)
-    for j in 2:nb
-        CNOT(b[j], b[1])
-    end
-    res = M(b[1])
-    for j in nb:-1:2
-        CNOT(b[j], b[1])
-    end
-
-    res
+    return stabilizer
 end
 
-@qprog tanner_decoder (nx, nz, nq, d) begin
-    s_x = [tanner_x_m(j) for j in 1:nx]
-    s_z = [tanner_z_m(j) for j in 1:nz]
+function get_phases(HXt, HZt)
+    phases, dx, dz = phases_from_css_code(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
 
-    r_x = css_check(d, s_x, "X", nq, _xadj)
-    r_z = css_check(d, s_z, "Z", nq, _zadj)
-
-    for j in 1:nq
-        sZ(j, r_x[j])
-        sX(j, r_z[j])
-    end
-
-    # a strange bug
-    e = reduce(&, r_z[1:((d-1)÷2)])
-
-    sX(1, e)
+    return phases
 end
 
-function check_tanner_decoder(m,k)
-    #=
-    p = 13
-    q = 5
 
-    G = pgl2(q)
-    S = jacobi4squares(p, q)
-    A = S
-    B = S
+open("rsc.csv", "w") do io
+    println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
 
-    HA = [Hamming743 Hamming743]
-    HAt = [Hamming733 Hamming733]
-    HB = [Hamming733 Hamming733]
-    HBt = [Hamming743 Hamming743]
-    =#
-    @info "Initailization Stage"
-    t0 = time()
-    @time begin
+    for k in 1:4
+        tm2 = time()
+        nq = 343*k
 
-        #G = [PrimeG(7^m*2^k, j-1) for j in 1:7^m*2^k]
-        #A = [PrimeG(7^m*2^k, (j-1)*7^(m-1)*2^k) for j in 1:7]
-        #B = [PrimeG(7^m*2^k, (j-1)*7^(m-1)*2^k) for j in 1:7]
-        aa = k
-        G = [PrimeG(7^m*aa, j-1) for j in 1:7^m*aa]
-        A = [PrimeG(7^m*aa, (j-1)*7^(m-1)*aa) for j in 1:7]
-        B = [PrimeG(7^m*aa, (j-1)*7^(m-1)*aa) for j in 1:7]
-
-        #HA = Hamming313
-        #HAt = Hamming322
-        #HB = Hamming322
-        #HBt = Hamming313
+        (HXt, HZt) = get_tanner_code(1, k)
         
-        HA = Hamming743
-        HAt = Hamming733
-        HB = Hamming733
-        HBt = Hamming743
-
-        HXt, HZt = TannerCode(G, A, B, HA, HAt, HB, HBt)
-
         n, nx = size(HXt)
         nz = size(HZt,2)
-
-        @show nx, nz
-
-        X_idxs = [findall(!iszero, HXt[:,j]) for j in 1:nx]
-        Z_idxs = [findall(!iszero, HZt[:,j]) for j in 1:nz]
-
-        _xadj(i) = X_idxs[i]
-        _zadj(i) = Z_idxs[i]
-
-        ρ01, ρ02, dx, dz = from_css_code(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
-        d = 6 #min(dx, dz)
-
-        ρ1 = copy(ρ01)
-        ρ2 = copy(ρ02)
-
-        σ = CState([
-            (:d, d),
-            (:tanner_decoder, tanner_decoder),
-            (:tanner_x_m, tanner_x_m),
-            (:tanner_z_m, tanner_z_m),
-            (:_xadj, _xadj),
-            (:_zadj, _zadj),
-            (:ctx, ctx),
-            (:css_check, css_check)
-        ])
-
-        num_x_errors = (d-1)÷2
-        x_errors = inject_errors(ρ1, "X")
-        ϕ_x1 = _sum(ctx, x_errors, n) == bv_val(ctx, num_x_errors, _len2(n)+1)
         
-        #num_z_errors = (d-1)÷2
-        #z_errors = inject_errors(ρ1, "Z")
-        #ϕ_z1 = _sum(ctx, z_errors, n) == bv_val(ctx, num_z_errors, _len2(n)+1)
+        @show n, k, nx, nz
+
+        (_xadj, _zadj) = get_adj(HXt, HZt, nx, nz)
+
+
+        rsc_decoder = QEC_Helper.qec_decoder
+        rsc_bug = QEC_Defaults.bug
+
+        d = 6 # min(dx, dz)
+        # rsc_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, rsc_bug)
+        rsc_decoder_params = (nx, nz, nq, d, ctx)
         
-        x_errors = inject_errors(ρ2, "X")
-        ϕ_x2 = _sum(ctx, x_errors, n) == bv_val(ctx, num_x_errors, _len2(n)+1)
+        rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
+            d=d,
+            num_qubits = nq,
+            _xadj=_xadj,
+            _zadj=_zadj,
+            stabilizer=get_stabilizer(HXt, HZt),
+            phases= get_phases(HXt, HZt),
+            ctx=ctx,
+            bug = rsc_bug,
+            decoder=rsc_decoder,
+            decoder_params=rsc_decoder_params)
 
-        #num_z_errors = (d-1)÷2
-        #z_errors = inject_errors(ρ2, "Z")
-        #ϕ_z2 = _sum(ctx, z_errors, n) == bv_val(ctx, num_z_errors, _len2(n)+1)
+        tm1 = time()
+        
 
-        cfg1 = SymConfig(tanner_decoder(nx,nz,n,d), σ, ρ1)
-        cfg2 = SymConfig(tanner_decoder(nx,nz,n,d), σ, ρ2)
+        # println("X_nbr: $(X_nbr)")
+        # println("Z_nbr: $(Z_nbr)")
+
+        # println("Phases: $(phases)")
+
+        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(rsc_decoder_config)
+
+        init_config = (tm2-tm1)
+        all += init_config
+
+        println("d,res,nq,all,init_config, init,config,cons_gen,cons_sol")
+        println("$(d),$(res_d),$(nq),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
+        println(io, "$(d),$(res_d),$(nq),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
     end
-
-    @info "Symbolic Execution Stage"
-    t1 = time()
-    @time begin
-        cfgs1 = QuantSymEx(cfg1)
-        cfgs2 = QuantSymEx(cfg2)
-    end
-
-    @info "SMT Solver Stage"
-    t2 = time()
-    @time begin
-        res = true
-        for cfg in cfgs1
-            if !check_state_equivalence(
-                cfg.ρ, ρ01, (ϕ_x1 #=& ϕ_z1=#, cfg.ϕ[1], cfg.ϕ[2]),
-                `bitwuzla --smt-comp-mode true -m true -rwl 0 -S kissat`)
-                res = false
-                break
-            end
-        end
-
-        if res
-            for cfg in cfgs2
-                if !check_state_equivalence(
-                    cfg.ρ, ρ02, (ϕ_x2 #=& ϕ_z2=#, cfg.ϕ[1], cfg.ϕ[2]),
-                    `bitwuzla --smt-comp-mode true -m true -rwl 0 -S kissat`)
-                    res = false
-                    break
-                end
-            end
-        end
-    end
-
-    t3 = time()
-
-    res, t3-t0, t1-t0, t2-t1, t3-t2
 end
 
-check_tanner_decoder(1,1) # precompile time
-
-open("tanner_code.dat", "w") do io
-  println(io, "nq all init qse smt")
-  println("nq all init qse smt")
-  for k in 1:4
-    res, all, init, qse, smt = check_tanner_decoder(1,k)
-    println(io, "$(343*k) $(all) $(init) $(qse) $(smt)")
-    println("$(k)/4: $(343*k) $(all) $(init) $(qse) $(smt)")
-  end
-end
