@@ -92,10 +92,6 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
         stabilizer = decoder_config.stabilizer
         (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
     end
-
-
-    # println("Encoded stabilizer : $(stabilizer)")
-    # println("Phases : $(decoder_config.phases)")
     
 
     # Res should be true initially, set false to disable later code
@@ -131,7 +127,5 @@ function check_qec_decoder(decoder_config::QecDecoderConfig)
 
     res, t4-t0, t1-t0, t2-t1, t3-t2, t4-t3
 end
-
-# export check_qec_decoder
 
 end
