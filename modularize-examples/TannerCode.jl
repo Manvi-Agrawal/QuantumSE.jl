@@ -117,59 +117,40 @@ function get_phases(HXt, HZt)
     return phases
 end
 
+function get_tanner_decoder_config(k::Integer)
+    # TODO: Fix this nq, currently hardcode for this specific Hamming code
+    nq = 343*k
 
-open("tanner.csv", "w") do io
-    println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
+    (HXt, HZt) = get_tanner_code(1, k)
+    
+    n, nx = size(HXt)
+    nz = size(HZt,2)
+    
+    @show n, k, nx, nz
 
-    for k in 1:4
-        tm2 = time()
-        nq = 343*k
-
-        (HXt, HZt) = get_tanner_code(1, k)
-        
-        n, nx = size(HXt)
-        nz = size(HZt,2)
-        
-        @show n, k, nx, nz
-
-        (_xadj, _zadj) = get_adj(HXt, HZt, nx, nz)
+    (_xadj, _zadj) = get_adj(HXt, HZt, nx, nz)
 
 
-        tanner_decoder = QEC_Defaults.qec_decoder
-        tanner_bug = QEC_Defaults.bug
+    tanner_decoder = QEC_Defaults.qec_decoder
+    tanner_bug = QEC_Defaults.bug
 
-        d = 6 # min(dx, dz)
-        # tanner_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, tanner_bug)
-        tanner_decoder_params = (nx, nz, nq, d, ctx)
-        
-        tanner_decoder_config = QEC_Pipeline.QecDecoderConfig(
-            d=d,
-            num_qubits = nq,
-            _xadj=_xadj,
-            _zadj=_zadj,
-            stabilizer=get_stabilizer(HXt, HZt),
-            phases= get_phases(HXt, HZt),
-            ctx=ctx,
-            bug = tanner_bug,
-            decoder=tanner_decoder,
-            decoder_params=tanner_decoder_params)
+    d = 6 # min(dx, dz)??
+    # tanner_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, tanner_bug)
+    tanner_decoder_params = (nx, nz, nq, d, ctx)
+    
+    tanner_decoder_config = QEC_Pipeline.QecDecoderConfig(
+        d=d,
+        num_qubits = nq,
+        _xadj=_xadj,
+        _zadj=_zadj,
+        stabilizer=get_stabilizer(HXt, HZt),
+        phases= get_phases(HXt, HZt),
+        ctx=ctx,
+        bug = tanner_bug,
+        decoder=tanner_decoder,
+        decoder_params=tanner_decoder_params)
 
-        tm1 = time()
-        
-
-        # println("X_nbr: $(X_nbr)")
-        # println("Z_nbr: $(Z_nbr)")
-
-        # println("Phases: $(phases)")
-
-        res_d, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(tanner_decoder_config)
-
-        init_config = (tm2-tm1)
-        all += init_config
-
-        println("d,res,nq,all,init_config, init,config,cons_gen,cons_sol")
-        println("$(d),$(res_d),$(nq),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-        println(io, "$(d),$(res_d),$(nq),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-    end
+    return tanner_decoder_config
 end
 
+QEC_Pipeline.qec_runner("tanner_code.csv", get_tanner_decoder_config, 1:4)
