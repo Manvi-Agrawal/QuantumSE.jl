@@ -1,9 +1,6 @@
 using QuantumSE
 using Z3
 
-# include("QEC_Helper.jl")
-# using .QEC_Helper
-
 include("QEC_Pipeline.jl")
 using .QEC_Pipeline
 
@@ -149,9 +146,6 @@ function get_phases(d)
 
     phases[d*d] = lx
     phases[2*d*d] = lz
-
-    println("Type(phases): $(typeof(phases))")
-    println("Length(phases): $(length(phases))")
 
     return phases
 end
