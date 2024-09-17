@@ -138,7 +138,7 @@ function qec_runner(file, get_decoder_config, range)
     @info "PRECOMPLIED qec code..."
 
     open(file, "w") do io
-        println(io, "d,res,nq,all,init_config,init,config,cons_gen,cons_sol")
+        println(io, "d,res,nq,all,decoder_config,sym_ex,config,cons_gen,cons_sol")
 
     
         for r in range
@@ -150,12 +150,12 @@ function qec_runner(file, get_decoder_config, range)
     
             res_d, d, nq, all, init, config, cons_gen, cons_sol = QEC_Pipeline.check_qec_decoder(decoder_config)
     
-            init_config = (tm1-tm2)
-            all += init_config
+            decoder_config = (tm1-tm2)
+            all += decoder_config
     
-            println("d,res,nq,all,init_config,init,config,cons_gen,cons_sol")
-            println("$(d),$(res_d),$(nq),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
-            println(io, "$(d),$(res_d),$(nq),$(all),$(init_config),$(init),$(config),$(cons_gen),$(cons_sol)")
+            println("d,res,nq,all,decoder_config,sym_ex,config,cons_gen,cons_sol")
+            println("$(d),$(res_d),$(nq),$(all),$(decoder_config),$(init),$(config),$(cons_gen),$(cons_sol)")
+            println(io, "$(d),$(res_d),$(nq),$(all),$(decoder_config),$(init),$(config),$(cons_gen),$(cons_sol)")
         end
     end    
 end
