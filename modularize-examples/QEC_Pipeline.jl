@@ -135,7 +135,8 @@ function qec_runner(file, get_decoder_config, range)
     @info "PRECOMPLIED qec code..."
 
     open(file, "w") do io
-        println(io, "d,res,nq,all,init,config,cons_gen,cons_sol")
+        println(io, "d,res,nq,all,init_config,init,config,cons_gen,cons_sol")
+
     
         for r in range
             tm2 = time()
