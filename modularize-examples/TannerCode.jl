@@ -91,10 +91,34 @@ function get_adj(HXt, HZt, nx, nz)
 end
 
 function get_tanner_code(m, k)
+    #=
+    p = 13
+    q = 5
+
+    G = pgl2(q)
+    S = jacobi4squares(p, q)
+    A = S
+    B = S
+
+    HA = [Hamming743 Hamming743]
+    HAt = [Hamming733 Hamming733]
+    HB = [Hamming733 Hamming733]
+    HBt = [Hamming743 Hamming743]
+    =#
+
+    #G = [PrimeG(7^m*2^k, j-1) for j in 1:7^m*2^k]
+    #A = [PrimeG(7^m*2^k, (j-1)*7^(m-1)*2^k) for j in 1:7]
+    #B = [PrimeG(7^m*2^k, (j-1)*7^(m-1)*2^k) for j in 1:7]
+
     aa = k
     G = [PrimeG(7^m*aa, j-1) for j in 1:7^m*aa]
     A = [PrimeG(7^m*aa, (j-1)*7^(m-1)*aa) for j in 1:7]
     B = [PrimeG(7^m*aa, (j-1)*7^(m-1)*aa) for j in 1:7]
+    
+    #HA = Hamming313
+    #HAt = Hamming322
+    #HB = Hamming322
+    #HBt = Hamming313
 
     HA = Hamming743
     HAt = Hamming733
@@ -107,35 +131,29 @@ end
 
 function get_stabilizer(HXt, HZt)
     stabilizer, dx, dz = stabilizer_from_css_code(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
-
     return stabilizer
 end
 
 function get_phases(HXt, HZt)
     phases, dx, dz = phases_from_css_code(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
-
     return phases
 end
 
 function get_tanner_decoder_config(k::Integer)
-    # TODO: Fix this nq, currently hardcode for this specific Hamming code
-    nq = 343*k
+    nq = 343*k # TODO: Fix this nq, currently hardcode for this specific Hamming code
 
     (HXt, HZt) = get_tanner_code(1, k)
     
     n, nx = size(HXt)
     nz = size(HZt,2)
-    
     @show n, k, nx, nz
 
     (_xadj, _zadj) = get_adj(HXt, HZt, nx, nz)
-
 
     tanner_decoder = QEC_Defaults.qec_decoder
     tanner_bug = QEC_Defaults.bug
 
     d = 6 # min(dx, dz)??
-    # tanner_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, tanner_bug)
     tanner_decoder_params = (nx, nz, nq, d, ctx)
     
     tanner_decoder_config = QEC_Pipeline.QecPipelineConfig(
