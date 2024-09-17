@@ -75,7 +75,6 @@ end
 end
 
 function get_phases(nq)
-
     phases = Vector{Z3.ExprAllocated}(undef, nq)
     lx = _bv_const(ctx, "lx")
     lz = _bv_const(ctx, "lz")
@@ -86,25 +85,17 @@ function get_phases(nq)
 
     phases[1] = lx
 
-    println("Type(phases): $(typeof(phases))")
-    println("Length(phases): $(length(phases))")
-
     return phases
 end
 
-function get_stabilizer(n)
-    num_qubits = n
+function get_stabilizer(nq::Integer)
+    stabilizer = Matrix{Bool}(undef, nq, 2*nq)
 
-    stabilizer = Matrix{Bool}(undef, num_qubits, 2*num_qubits)
-
-    @simd for i in 1:n-1
-        stabilizer[i+1,:] = repetition_s(n, i)
+    @simd for i in 1:nq-1
+        stabilizer[i+1,:] = repetition_s(nq, i)
     end
 
-    stabilizer[1,:] = repetition_lx(n)
-
-    println("Type(stabilizer): $(typeof(stabilizer))")
-
+    stabilizer[1,:] = repetition_lx(nq)
     return stabilizer
 end
 
@@ -120,7 +111,6 @@ function get_repetition_decoder_config(n)
         decoder=repetition_decoder,
         decoder_params=repetition_decoder_params)
 
-    # repetition_decoder_config.x_syndrome_circuit = repetition_m_xx
     repetition_decoder_config.z_syndrome_circuit = repetition_m_zz
     repetition_decoder_config.decoder_algo_xz = mwpm
 
@@ -128,4 +118,3 @@ function get_repetition_decoder_config(n)
 end
 
 QEC_Pipeline.qec_runner("repetition_code.csv", get_repetition_decoder_config, 3:5)
-
