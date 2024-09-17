@@ -126,18 +126,16 @@ function get_rsc_decoder_config(d::Integer)
     _xadj(j) = X_nbr[j]
     _zadj(j) = Z_nbr[j]
 
-    nx = nz = (nq-1)÷2
-    rsc_decoder_params = (nx, nz, nq, d, ctx)
-
     rsc_decoder_config = QEC_Pipeline.QecPipelineConfig(
         d=d,
         num_qubits = nq,
         _xadj=_xadj,
         _zadj=_zadj,
+        nx=(nq-1)÷2,
+        nz=(nq-1)÷2,
         stabilizer=stabilizer,
         phases= get_phases(nq),
-        ctx=ctx,
-        decoder_params=rsc_decoder_params)
+        ctx=ctx)
 
     return rsc_decoder_config
 end

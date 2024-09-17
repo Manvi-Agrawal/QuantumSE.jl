@@ -140,8 +140,6 @@ function get_phases(HXt, HZt)
 end
 
 function get_tanner_decoder_config(k::Integer)
-    nq = 343*k # TODO: Fix this nq, currently hardcode for this specific Hamming code
-
     (HXt, HZt) = get_tanner_code(1, k)
     
     n, nx = size(HXt)
@@ -150,23 +148,16 @@ function get_tanner_decoder_config(k::Integer)
 
     (_xadj, _zadj) = get_adj(HXt, HZt, nx, nz)
 
-    tanner_decoder = QEC_Defaults.qec_decoder
-    tanner_bug = QEC_Defaults.bug
-
-    d = 6 # min(dx, dz)??
-    tanner_decoder_params = (nx, nz, nq, d, ctx)
-    
     tanner_decoder_config = QEC_Pipeline.QecPipelineConfig(
-        d=d,
-        num_qubits = nq,
+        d=6, # min(dx, dz)??
+        num_qubits = 343*k, # TODO: Fix this nq, currently hardcode for this specific Hamming code
         _xadj=_xadj,
         _zadj=_zadj,
+        nx=nx,
+        nz=nz,
         stabilizer=get_stabilizer(HXt, HZt),
         phases= get_phases(HXt, HZt),
-        ctx=ctx,
-        bug = tanner_bug,
-        decoder=tanner_decoder,
-        decoder_params=tanner_decoder_params)
+        ctx=ctx)
 
     return tanner_decoder_config
 end

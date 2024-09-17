@@ -76,8 +76,10 @@ Base.@kwdef mutable struct QecPipelineConfig
     ctx
     _xadj = missing
     _zadj = missing
+    nx = missing
+    nz = missing
     decoder = QEC_Defaults.qec_decoder
-    decoder_params = missing
+    decoder_params = (nx, nz, num_qubits, d, ctx)
     x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit
     z_syndrome_circuit = QEC_Defaults.z_syndrome_circuit
     decoder_algo_xz = QEC_Defaults.decoder_algo_xz
@@ -94,6 +96,7 @@ function check_qec_decoder(decoder_config::QecPipelineConfig)
         (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
     end
     
+    # @show decoder_config
 
     # Res should be true initially, set false to disable later code
     res = true
