@@ -106,23 +106,11 @@ function rsc_l_op(d::Integer)
     return [(sc_lx, "X")]
 end
 
-function get_phases(num_qubits::Integer)
-    lx = _bv_const(ctx, "lx")
-    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
-
-    for i in 1:num_qubits-1
-        phases[i] = _bv_val(ctx, 0)
-    end
-
-    phases[num_qubits] = lx
-    return phases
-end
-
 function get_rsc_decoder_config(d::Integer)
     nq = d*d
         
     (X_nbr, Z_nbr) = get_nbr(d)
-    stabilizer = QEC_Helper.get_stabilizer_from_nbr(nq, X_nbr, Z_nbr, rsc_l_op(d))
+    (stabilizer,phases) = QEC_Helper.encoder_from_nbr(nq, X_nbr, Z_nbr, rsc_l_op(d))
     _xadj(j) = X_nbr[j]
     _zadj(j) = Z_nbr[j]
 
@@ -140,4 +128,4 @@ function get_rsc_decoder_config(d::Integer)
     return rsc_decoder_config
 end
 
-QEC_Pipeline.qec_runner("rsc.csv",get_rsc_decoder_config, 3:2:7)
+QEC_Pipeline.qec_runner("rsc.csv",get_rsc_decoder_config, 3:2:11)
