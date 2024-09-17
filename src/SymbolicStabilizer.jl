@@ -286,6 +286,34 @@ function phases_from_css_code(HX, HZ, ctx::Z3.ContextAllocated)
     return (phases1, dx, dz)
 end
 
+function from_css_code_v2(HX, HZ, ctx::Z3.ContextAllocated)
+    n = size(HX, 2)
+
+    X = rref(HX)
+    nx = rank(X)
+    X = X[1:nx,:]
+
+    Z = rref(HZ)
+    nz = rank(Z)
+    Z = Z[1:nz,:]
+
+    LZ = logical_operators(X, Z)
+    LX = logical_operators(Z, X)
+    nl = size(LZ, 1)
+    dx = minimum([length(findall(!iszero, LX[j,:])) for j in 1:nl])
+    dz = minimum([length(findall(!iszero, LZ[j,:])) for j in 1:nl])
+    println("[[n, k, dx, dz]] = [[$(n), $(nl), dx<$(dx), dz<$(dz)]]")
+    
+    stabilizer1 = Matrix{Bool}([[X;LX] zeros(GF2, nx+nl, n);zeros(GF2, nz, n) Z])
+    phases1 = [_bv_val(ctx, 0) for j in 1:n]
+    for j in 1:nl
+        phases1[nx+j] = _bv_const(ctx, "lx$(j)")
+    end
+    
+
+    return (stabilizer1, phases1, dx, dz)
+end
+
 function from_css_code(HX, HZ, ctx::Z3.ContextAllocated)
     n = size(HX, 2)
 

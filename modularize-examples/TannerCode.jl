@@ -129,18 +129,9 @@ function get_tanner_code(m, k)
 
 end
 
-function get_stabilizer(HXt, HZt)
-    stabilizer, dx, dz = stabilizer_from_css_code(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
-    return stabilizer
-end
-
-function get_phases(HXt, HZt)
-    phases, dx, dz = phases_from_css_code(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
-    return phases
-end
-
 function get_tanner_decoder_config(k::Integer)
     (HXt, HZt) = get_tanner_code(1, k)
+    (stabilizer,phases, dx, dz) = from_css_code_v2(Matrix{GF2}(transpose(HXt)), Matrix{GF2}(transpose(HZt)), ctx)
     
     n, nx = size(HXt)
     nz = size(HZt,2)
@@ -155,8 +146,8 @@ function get_tanner_decoder_config(k::Integer)
         _zadj=_zadj,
         nx=nx,
         nz=nz,
-        stabilizer=get_stabilizer(HXt, HZt),
-        phases= get_phases(HXt, HZt),
+        stabilizer=stabilizer,
+        phases=phases,
         ctx=ctx)
 
     return tanner_decoder_config
