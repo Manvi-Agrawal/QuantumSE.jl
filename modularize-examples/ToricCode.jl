@@ -196,7 +196,7 @@ end
 function get_toric_decoder_config(d)
     stabilizer = get_stabilizer(d)
 
-    toric_decoder_config = QEC_Pipeline.QecDecoderConfig(
+    toric_decoder_config = QEC_Pipeline.QecPipelineConfig(
         d=d,
         num_qubits=2*d*d,
         stabilizer=stabilizer,

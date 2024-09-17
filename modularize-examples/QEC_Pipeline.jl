@@ -68,7 +68,7 @@ function get_sym_config(stabilizer, decoder_config)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 
-Base.@kwdef mutable struct QecDecoderConfig
+Base.@kwdef mutable struct QecPipelineConfig
     d::Integer
     num_qubits::Integer
     stabilizer
@@ -84,7 +84,7 @@ Base.@kwdef mutable struct QecDecoderConfig
     bug = QEC_Defaults.bug
 end
 
-function check_qec_decoder(decoder_config::QecDecoderConfig)
+function check_qec_decoder(decoder_config::QecPipelineConfig)
     @info "Initialization Stage"
     t0 = time()
     begin

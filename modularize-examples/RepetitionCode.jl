@@ -110,7 +110,7 @@ end
 
 function get_repetition_decoder_config(n)
     repetition_decoder_params = (n)
-    repetition_decoder_config = QEC_Pipeline.QecDecoderConfig(
+    repetition_decoder_config = QEC_Pipeline.QecPipelineConfig(
         d=n,
         num_qubits=n,
         stabilizer=get_stabilizer(n),

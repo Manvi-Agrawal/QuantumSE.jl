@@ -153,7 +153,7 @@ function get_rsc_decoder_config(d::Integer)
     nz = (nq-1)÷2
     rsc_decoder_params = (nx, nz, nq, d, ctx)
 
-    rsc_decoder_config = QEC_Pipeline.QecDecoderConfig(
+    rsc_decoder_config = QEC_Pipeline.QecPipelineConfig(
         d=d,
         num_qubits = nq,
         _xadj=_xadj,

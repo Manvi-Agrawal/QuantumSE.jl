@@ -138,7 +138,7 @@ function get_tanner_decoder_config(k::Integer)
     # tanner_decoder_params = (ctx, d, nq, xlim, zlim, _xadj, _zadj, tanner_bug)
     tanner_decoder_params = (nx, nz, nq, d, ctx)
     
-    tanner_decoder_config = QEC_Pipeline.QecDecoderConfig(
+    tanner_decoder_config = QEC_Pipeline.QecPipelineConfig(
         d=d,
         num_qubits = nq,
         _xadj=_xadj,
