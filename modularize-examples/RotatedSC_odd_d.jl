@@ -41,7 +41,6 @@ function _adj2_ver(d, idx)
     return [r*d + c, (r+1)*d + c] .+ 1
 end
 
-
 function get_nbr(d::Integer)
     num_qubits = d*d
     gen_s = (num_qubits-1)÷2
@@ -101,56 +100,33 @@ function get_nbr(d::Integer)
 
 end
 
-
 function rsc_l_op(d::Integer)
     # r: 1, 2, ..., d ;; c = 1
     sc_lx = [ 1+ r*d + 1 for r in 0:(d-1) ]
-
     return [(sc_lx, "X")]
-
 end
 
-
-function get_phases(d::Integer)
-    num_qubits = d*d
-
-    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
+function get_phases(num_qubits::Integer)
     lx = _bv_const(ctx, "lx")
+    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
 
     for i in 1:num_qubits-1
         phases[i] = _bv_val(ctx, 0)
     end
 
     phases[num_qubits] = lx
-
     return phases
 end
-
-function decoder_bug(ρ, r_x, r_z, d)
-    println("RSC_bug")
-    e = reduce(&, r_z[1:(d-1)÷2])
-
-    # sX(ρ, 1, e)
-    sX(1, e)
-
-    println("RSC_bug end")
-    nothing
-
-end
-
 
 function get_rsc_decoder_config(d::Integer)
     nq = d*d
         
     (X_nbr, Z_nbr) = get_nbr(d)
-
     stabilizer = QEC_Helper.get_stabilizer_from_nbr(nq, X_nbr, Z_nbr, rsc_l_op(d))
-
     _xadj(j) = X_nbr[j]
     _zadj(j) = Z_nbr[j]
 
-    nx = (nq-1)÷2
-    nz = (nq-1)÷2
+    nx = nz = (nq-1)÷2
     rsc_decoder_params = (nx, nz, nq, d, ctx)
 
     rsc_decoder_config = QEC_Pipeline.QecPipelineConfig(
@@ -159,7 +135,7 @@ function get_rsc_decoder_config(d::Integer)
         _xadj=_xadj,
         _zadj=_zadj,
         stabilizer=stabilizer,
-        phases= get_phases(d),
+        phases= get_phases(nq),
         ctx=ctx,
         decoder_params=rsc_decoder_params)
 
