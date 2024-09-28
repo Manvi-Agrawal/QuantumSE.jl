@@ -4,6 +4,9 @@ using Z3
 include("QEC_Pipeline.jl")
 using .QEC_Pipeline
 
+include("QecDecoder.jl")
+include("QecPipelineConfig.jl")
+
 ctx = Context()
 
 _adj(idx) = [idx, idx+1]
@@ -60,7 +63,7 @@ function repetition_lz(n)
     s
 end
 
-@qprog repetition_decoder (nq) begin
+@qprog repetition_decoder_ckt (nq) begin
     s = [z_syndrome_circuit(nq, j) for j in 1:nq]
 
     r = decoder_algo_xz(nq, s)
@@ -99,20 +102,25 @@ function get_stabilizer(nq::Integer)
     return stabilizer
 end
 
-function get_repetition_decoder_config(n)
-    repetition_decoder_params = (n)
-    repetition_decoder_config = QEC_Pipeline.QecPipelineConfig(
-        d=n,
-        num_qubits=n,
-        stabilizer=get_stabilizer(n),
-        phases= get_phases(n),
+function get_repetition_decoder(nq)
+    return QecDecoder(
+        d=nq,
+        num_qubits = nq,
         ctx=ctx,
-        _zadj=_adj,
-        decoder=repetition_decoder,
-        decoder_params=repetition_decoder_params)
+        decoder = repetition_decoder_ckt,
+        decoder_params = (nq),
+        z_syndrome_circuit = repetition_m_zz,
+        decoder_algo_xz = mwpm
+    )
 
-    repetition_decoder_config.z_syndrome_circuit = repetition_m_zz
-    repetition_decoder_config.decoder_algo_xz = mwpm
+end
+
+function get_repetition_decoder_config(nq)
+    repetition_decoder_config = QecPipelineConfig(
+        stabilizer=get_stabilizer(nq),
+        phases= get_phases(nq),
+        decoder=get_repetition_decoder(nq)
+    )
 
     return repetition_decoder_config
 end

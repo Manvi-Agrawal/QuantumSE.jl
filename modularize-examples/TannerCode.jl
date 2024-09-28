@@ -12,6 +12,9 @@ using .QEC_Pipeline
 include("QEC_Helper.jl")
 using .QEC_Helper
 
+include("QecDecoder.jl")
+include("QecPipelineConfig.jl")
+
 ctx = Z3.Context()
 
 struct PrimeG <: AbstractGroup
@@ -139,16 +142,20 @@ function get_tanner_decoder_config(k::Integer)
 
     (_xadj, _zadj) = get_adj(HXt, HZt, nx, nz)
 
-    tanner_decoder_config = QEC_Pipeline.QecPipelineConfig(
-        d=6, # min(dx, dz)??
+    tanner_decoder = QecDecoder(
+        d=6,  # min(dx, dz)??
         num_qubits = 343*k, # TODO: Fix this nq, currently hardcode for this specific Hamming code
         _xadj=_xadj,
         _zadj=_zadj,
         nx=nx,
         nz=nz,
+        ctx=ctx
+    )
+
+    tanner_decoder_config = QecPipelineConfig(
         stabilizer=stabilizer,
         phases=phases,
-        ctx=ctx)
+        decoder=tanner_decoder)
 
     return tanner_decoder_config
 end

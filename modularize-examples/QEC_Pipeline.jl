@@ -11,6 +11,8 @@ using .QEC_Decoder_Defaults
 include("QEC_Helper.jl")
 using .QEC_Helper
 
+# include("QecPipelineConfig.jl")
+
 
 N4 = 4
 N2 = 2
@@ -22,19 +24,21 @@ AD2_V = 2
 ctx = Context()
 
 function get_sym_config(stabilizer, decoder_config)
-    d = decoder_config.d
     phases = decoder_config.phases
-    _xadj = decoder_config._xadj
-    _zadj = decoder_config._zadj
-    ctx = decoder_config.ctx
-    x_syndrome_circuit = decoder_config.x_syndrome_circuit
-    z_syndrome_circuit = decoder_config.z_syndrome_circuit
-    decoder_algo_xz = decoder_config.decoder_algo_xz
-    bug = decoder_config.bug
+
+    decoder = decoder_config.decoder
+    d = decoder.d
+    _xadj = decoder._xadj
+    _zadj = decoder._zadj
+    ctx = decoder.ctx
+    x_syndrome_circuit = decoder.x_syndrome_circuit
+    z_syndrome_circuit = decoder.z_syndrome_circuit
+    decoder_algo_xz = decoder.decoder_algo_xz
+    bug = decoder.bug
 
 
     # println("LOG-INFO: Inside get_sym_config")
-    num_qubits = decoder_config.num_qubits
+    num_qubits = decoder.num_qubits
 
     
 
@@ -44,7 +48,7 @@ function get_sym_config(stabilizer, decoder_config)
 
     ρ1 = copy(ρ01)
 
-    qec_decoder = decoder_config.decoder
+    qec_decoder = decoder.decoder
     σ = CState([(:d, d),
         (:qec_decoder, qec_decoder),
         (:x_syndrome_circuit, x_syndrome_circuit),
@@ -64,34 +68,35 @@ function get_sym_config(stabilizer, decoder_config)
     xlim = (nq-1)÷2
     zlim = (nq-1)÷2
 
-    decoder = qec_decoder(decoder_config.decoder_params...)
+    decoder = qec_decoder(decoder.decoder_params...)
     return (ρ01, ϕ_x1, SymConfig(decoder, σ, ρ1) )
 end
 
-Base.@kwdef mutable struct QecPipelineConfig
-    d::Integer
-    num_qubits::Integer
-    stabilizer
-    phases
-    ctx
-    _xadj = missing
-    _zadj = missing
-    nx = missing
-    nz = missing
-    decoder = QEC_Decoder_Defaults.qec_decoder_ckt
-    decoder_params = (nx, nz, num_qubits, d, ctx)
-    x_syndrome_circuit = QEC_Decoder_Defaults.x_syndrome_circuit
-    z_syndrome_circuit = QEC_Decoder_Defaults.z_syndrome_circuit
-    decoder_algo_xz = QEC_Decoder_Defaults.decoder_algo_xz
-    bug = QEC_Decoder_Defaults.bug
-end
+# Base.@kwdef mutable struct QecPipelineConfig
+#     d::Integer
+#     num_qubits::Integer
+#     stabilizer
+#     phases
+#     ctx
+#     _xadj = missing
+#     _zadj = missing
+#     nx = missing
+#     nz = missing
+#     decoder = QEC_Decoder_Defaults.qec_decoder_ckt
+#     decoder_params = (nx, nz, num_qubits, d, ctx)
+#     x_syndrome_circuit = QEC_Decoder_Defaults.x_syndrome_circuit
+#     z_syndrome_circuit = QEC_Decoder_Defaults.z_syndrome_circuit
+#     decoder_algo_xz = QEC_Decoder_Defaults.decoder_algo_xz
+#     bug = QEC_Decoder_Defaults.bug
+# end
 
-function check_qec_decoder(decoder_config::QecPipelineConfig)
+function check_qec_decoder(decoder_config)
     @info "Initialization Stage"
     t0 = time()
     begin
-        d = decoder_config.d
-        nq = decoder_config.num_qubits
+        decoder=decoder_config.decoder
+        d = decoder.d
+        nq = decoder.num_qubits
         stabilizer = decoder_config.stabilizer
         (ρ01, ϕ_x1, cfg1) = get_sym_config(stabilizer, decoder_config)
     end

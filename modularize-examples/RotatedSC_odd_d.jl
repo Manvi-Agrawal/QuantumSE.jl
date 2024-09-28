@@ -9,6 +9,9 @@ using .QEC_Pipeline
 include("QEC_Helper.jl")
 using .QEC_Helper
 
+include("QecPipelineConfig.jl")
+include("QecDecoder.jl")
+
 using Z3
 
 N4 = 4
@@ -110,20 +113,24 @@ function get_rsc_decoder_config(d::Integer)
     nq = d*d
         
     (X_nbr, Z_nbr) = get_nbr(d)
-    (stabilizer,phases) = QEC_Helper.encoder_from_nbr(nq, X_nbr, Z_nbr, rsc_l_op(d))
+    (stabilizer,phases) = QEC_Helper.encoder_from_nbr(nq, X_nbr, Z_nbr, rsc_l_op(d), ctx)
     _xadj(j) = X_nbr[j]
     _zadj(j) = Z_nbr[j]
 
-    rsc_decoder_config = QEC_Pipeline.QecPipelineConfig(
+    rsc_decoder = QecDecoder(
         d=d,
         num_qubits = nq,
         _xadj=_xadj,
         _zadj=_zadj,
         nx=(nq-1)÷2,
         nz=(nq-1)÷2,
+        ctx=ctx
+    )
+
+    rsc_decoder_config = QecPipelineConfig(
         stabilizer=stabilizer,
-        phases= get_phases(nq),
-        ctx=ctx)
+        phases= phases,
+        decoder=rsc_decoder)
 
     return rsc_decoder_config
 end

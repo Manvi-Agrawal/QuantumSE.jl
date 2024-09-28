@@ -4,6 +4,12 @@ using Z3
 include("QEC_Pipeline.jl")
 using .QEC_Pipeline
 
+include("QEC_Decoder_Defaults.jl")
+using .QEC_Decoder_Defaults
+
+include("QecDecoder.jl")
+include("QecPipelineConfig.jl")
+
 ctx = Context()
 
 function _xadj(d, idx)
@@ -167,7 +173,7 @@ function get_stabilizer(d)
     return stabilizer
 end
 
-@qprog toric_decoder (d) begin
+@qprog toric_decoder_ckt (d) begin
 
     s_x = [x_syndrome_circuit(d, j) for j in 1:d*d]
     s_z = [z_syndrome_circuit(d, j) for j in 1:d*d]
@@ -187,24 +193,39 @@ end
 
 end
 
-function get_toric_decoder_config(d)
-    stabilizer = get_stabilizer(d)
-
-    toric_decoder_config = QEC_Pipeline.QecPipelineConfig(
+function get_toric_decoder(d, ctx)
+    return QecDecoder(
         d=d,
         num_qubits=2*d*d,
-        stabilizer=stabilizer,
-        phases= get_phases(d),
         ctx=ctx,
         _xadj=_xadj,
         _zadj=_zadj,
+        nx=d*d,
+        nz=d*d,
+        decoder = toric_decoder_ckt,
+        decoder_params = (d),
+        x_syndrome_circuit = toric_x_m,
+        z_syndrome_circuit = toric_z_m,
+        decoder_algo_xz = mwpm
+    )
+
+end
+
+function get_toric_decoder_config(d)
+    stabilizer = get_stabilizer(d)
+
+
+    toric_decoder_config = QecPipelineConfig(
+        stabilizer=stabilizer,
+        phases= get_phases(d),
+        decoder=get_toric_decoder(d, ctx)
         )
 
-    toric_decoder_config.x_syndrome_circuit = toric_x_m
-    toric_decoder_config.z_syndrome_circuit = toric_z_m
-    toric_decoder_config.decoder_algo_xz = mwpm
-    toric_decoder_config.decoder = toric_decoder
-    toric_decoder_config.decoder_params = (d)
+    # toric_decoder_config.x_syndrome_circuit = toric_x_m
+    # toric_decoder_config.z_syndrome_circuit = toric_z_m
+    # toric_decoder_config.decoder_algo_xz = mwpm
+    # toric_decoder_config.decoder = toric_decoder
+    # toric_decoder_config.decoder_params = (d)
 
     return toric_decoder_config
 end

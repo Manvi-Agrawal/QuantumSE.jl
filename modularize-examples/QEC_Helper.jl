@@ -1,10 +1,11 @@
 module QEC_Helper
 
 using QuantumSE
+# using Z3
 
-function encoder_from_nbr(num_qubits::Integer, X_nbr, Z_nbr, l_op)
+function encoder_from_nbr(num_qubits::Integer, X_nbr, Z_nbr, l_op, ctx)
     stabilizer = fill(false, num_qubits, 2*num_qubits)
-    phases = Vector{Z3.ExprAllocated}(undef, num_qubits)
+    phases = fill( _bv_val(ctx, 0), num_qubits)
 
     lx = _bv_const(ctx, "lx")
     lz = _bv_const(ctx, "lz")
@@ -13,7 +14,7 @@ function encoder_from_nbr(num_qubits::Integer, X_nbr, Z_nbr, l_op)
         for idx in X_nbr[row]
             # println("Set $(row), $(idx) to true...")
             stabilizer[row, idx] = true
-            phases[row] = _bv_val(ctx, 0)
+            # phases[row] = _bv_val(ctx, 0)
         end
     end
     
@@ -23,7 +24,7 @@ function encoder_from_nbr(num_qubits::Integer, X_nbr, Z_nbr, l_op)
             s_col = num_qubits+idx
             # println("Set $(s_row), $(s_col) to true...")
             stabilizer[s_row, s_col] = true
-            phases[s_row] = _bv_val(ctx, 0)
+            # phases[s_row] = _bv_val(ctx, 0)
         end
     end 
 
