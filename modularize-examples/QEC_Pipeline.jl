@@ -5,8 +5,8 @@ module QEC_Pipeline
 using QuantumSE
 using Z3
 
-include("QEC_Defaults.jl")
-using .QEC_Defaults
+include("QEC_Decoder_Defaults.jl")
+using .QEC_Decoder_Defaults
 
 include("QEC_Helper.jl")
 using .QEC_Helper
@@ -78,12 +78,12 @@ Base.@kwdef mutable struct QecPipelineConfig
     _zadj = missing
     nx = missing
     nz = missing
-    decoder = QEC_Defaults.qec_decoder
+    decoder = QEC_Decoder_Defaults.qec_decoder_ckt
     decoder_params = (nx, nz, num_qubits, d, ctx)
-    x_syndrome_circuit = QEC_Defaults.x_syndrome_circuit
-    z_syndrome_circuit = QEC_Defaults.z_syndrome_circuit
-    decoder_algo_xz = QEC_Defaults.decoder_algo_xz
-    bug = QEC_Defaults.bug
+    x_syndrome_circuit = QEC_Decoder_Defaults.x_syndrome_circuit
+    z_syndrome_circuit = QEC_Decoder_Defaults.z_syndrome_circuit
+    decoder_algo_xz = QEC_Decoder_Defaults.decoder_algo_xz
+    bug = QEC_Decoder_Defaults.bug
 end
 
 function check_qec_decoder(decoder_config::QecPipelineConfig)

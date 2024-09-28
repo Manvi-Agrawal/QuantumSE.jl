@@ -3,8 +3,8 @@ using Z3
 using SparseArrays
 using LinearAlgebra: nullspace
 
-include("QEC_Defaults.jl")
-using .QEC_Defaults
+include("QEC_Decoder_Defaults.jl")
+using .QEC_Decoder_Defaults
 
 include("QEC_Pipeline.jl")
 using .QEC_Pipeline

@@ -1,4 +1,4 @@
-module QEC_Defaults
+module QEC_Decoder_Defaults
 
 
 using QuantumSE
@@ -58,7 +58,7 @@ function bug(ρ, r_x, r_z, d)
     println("NO BUG....")
 end
 
-@qprog qec_decoder (nx, nz, nq, d, ctx) begin
+@qprog qec_decoder_ckt (nx, nz, nq, d, ctx) begin
     # println("Decoder start")
 
     s_x = [x_syndrome_circuit(j) for j in 1:nx]
@@ -80,6 +80,6 @@ end
     # println("Decoder end")
 end
 
-# export decoder_algo_xz, qec_default_x_syn_ckt, qec_default_z_syn_ckt
+# export decoder_algo_xz, qec_default_x_syn_ckt, qec_default_z_syn_ckt, bug, qec_decoder_ckt
 
 end
